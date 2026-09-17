@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Unify Survey Bot — Workspace Overview (static preview)</title>
+<link rel="stylesheet" href="../app/globals.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── Sidebar (components/Sidebar.tsx) ───────────────────────── -->
+  <aside style="width:var(--sidebar-width);position:fixed;top:0;left:0;bottom:0;background:var(--bg-surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50;">
+    <div style="height:var(--topbar-height);display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid var(--border);">
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#25D366 0%,#128C7E 100%);display:flex;align-items:center;justify-content:center;color:#000;font-weight:800;font-size:18px;box-shadow:0 0 16px var(--green-glow);">U</div>
+      <div>
+        <div style="font-weight:800;font-size:16px;letter-spacing:-0.02em;color:var(--text-primary);">Unify</div>
+        <div style="font-size:11px;color:var(--text-secondary);font-weight:500;">Survey Bot</div>
+      </div>
+    </div>
+
+    <nav style="padding:20px 12px;flex:1;display:flex;flex-direction:column;gap:4px;">
+      <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-md);font-size:14px;font-weight:600;color:var(--green);background:var(--green-dim);border:1px solid rgba(37,211,102,0.2);transition:all .2s ease;">
+        <span style="font-size:16px;">📊</span><span>Dashboard</span>
+      </a>
+      <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-md);font-size:14px;font-weight:500;color:var(--text-secondary);background:transparent;border:1px solid transparent;transition:all .2s ease;">
+        <span style="font-size:16px;">📋</span><span>Surveys</span>
+      </a>
+      <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-md);font-size:14px;font-weight:500;color:var(--text-secondary);background:transparent;border:1px solid transparent;transition:all .2s ease;">
+        <span style="font-size:16px;">➕</span><span>New Survey</span>
+      </a>
+      <a href="#" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-md);font-size:14px;font-weight:500;color:var(--text-secondary);background:transparent;border:1px solid transparent;transition:all .2s ease;">
+        <span style="font-size:16px;">⚙️</span><span>Settings</span>
+      </a>
+    </nav>
+
+    <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--purple-dim);color:var(--purple);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;">EG</div>
+      <div style="flex:1;overflow:hidden;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">Engineering Admin</div>
+        <div style="font-size:11px;color:var(--text-muted);">WhatsApp Connected</div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-content">
+
+    <!-- ── Topbar (components/Topbar.tsx) ───────────────────────── -->
+    <header style="height:var(--topbar-height);position:fixed;top:0;right:0;left:var(--sidebar-width);background:var(--glass-bg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:40;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="badge badge-active">WhatsApp Live</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <a href="#" class="btn btn-primary btn-sm"><span>⚡ Create Survey</span></a>
+      </div>
+    </header>
+
+    <!-- ── Dashboard page (app/(dashboard)/dashboard/page.tsx) ──── -->
+    <main class="page-content">
+      <div class="animate-fade-up">
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Workspace Overview</h1>
+            <p class="page-subtitle">Real-time survey performance and WhatsApp respondent engagement.</p>
+          </div>
+          <div style="display:flex;gap:12px;">
+            <a href="#" class="btn btn-primary">➕ Create Survey</a>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="glass-card stat-card green">
+            <div class="stat-label">Total Responses</div>
+            <div class="stat-value">487</div>
+            <div class="stat-change">↑ 24% this week</div>
+          </div>
+          <div class="glass-card stat-card purple">
+            <div class="stat-label">Avg. Completion Rate</div>
+            <div class="stat-value">73.5%</div>
+            <div class="stat-change" style="color:var(--purple);">vs 28% Google Forms</div>
+          </div>
+          <div class="glass-card stat-card blue">
+            <div class="stat-label">Active Surveys</div>
+            <div class="stat-value">3</div>
+            <div class="stat-change" style="color:var(--blue);">100% automated via WhatsApp</div>
+          </div>
+          <div class="glass-card stat-card amber">
+            <div class="stat-label">Avg. Completion Time</div>
+            <div class="stat-value">1m 45s</div>
+            <div class="stat-change" style="color:var(--amber);">⚡ Instant WhatsApp responses</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-bottom:28px;">
+
+          <div class="glass-card" style="padding:24px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+              <div>
+                <h3 style="font-size:16px;font-weight:700;">Response Activity</h3>
+                <p style="font-size:13px;color:var(--text-secondary);">Daily completed responses across WhatsApp surveys</p>
+              </div>
+              <span class="badge badge-active">Live Engine</span>
+            </div>
+            <div id="trend" style="height:200px;display:flex;align-items:flex-end;gap:16px;padding-top:20px;"></div>
+          </div>
+
+          <div class="glass-card" style="padding:24px;">
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px;">Key Demographics</h3>
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">Engineering Student Breakdown</p>
+            <div id="demo" style="display:flex;flex-direction:column;gap:16px;"></div>
+          </div>
+
+        </div>
+
+        <div class="glass-card" style="padding:24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div>
+              <h3 style="font-size:18px;font-weight:700;">My Surveys</h3>
+              <p style="font-size:13px;color:var(--text-secondary);">Manage active WhatsApp entry points and track completion.</p>
+            </div>
+            <a href="#" class="btn btn-secondary btn-sm">View All Surveys →</a>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Title</th><th>Status</th><th>Questions</th><th>Attempts</th>
+                <th>Completed</th><th>Completion Rate</th><th>WhatsApp Share</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+// Same mock data as the React page
+const bars = [
+  { day: 'Sep 3', count: 34, height: '40%' },
+  { day: 'Sep 4', count: 52, height: '65%' },
+  { day: 'Sep 5', count: 88, height: '90%' },
+  { day: 'Sep 6', count: 64, height: '70%' },
+  { day: 'Sep 7', count: 95, height: '98%' },
+  { day: 'Sep 8', count: 71, height: '75%' },
+  { day: 'Sep 9', count: 83, height: '85%' },
+];
+document.getElementById('trend').innerHTML = bars.map(b => `
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;">
+    <div style="font-size:11px;color:var(--green);font-weight:600;">${b.count}</div>
+    <div style="width:100%;max-width:40px;height:${b.height};background:linear-gradient(180deg,var(--green) 0%,rgba(37,211,102,0.1) 100%);border-radius:6px 6px 0 0;box-shadow:0 0 12px var(--green-glow);transition:all .3s ease;"></div>
+    <div style="font-size:11px;color:var(--text-muted);">${b.day}</div>
+  </div>`).join('');
+
+const demo = [
+  { name: 'Mechanical Eng.', pct: 42, color: 'var(--green)' },
+  { name: 'Electrical & Electronics', pct: 31, color: 'var(--purple)' },
+  { name: 'Computer Eng.', pct: 19, color: 'var(--blue)' },
+  { name: 'Civil & Chemical Eng.', pct: 8, color: 'var(--amber)' },
+];
+document.getElementById('demo').innerHTML = demo.map(d => `
+  <div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+      <span style="color:var(--text-primary);font-weight:500;">${d.name}</span>
+      <span style="color:${d.color};font-weight:700;">${d.pct}%</span>
+    </div>
+    <div style="width:100%;height:8px;background:var(--bg-input);border-radius:4px;overflow:hidden;">
+      <div style="width:${d.pct}%;height:100%;background:${d.color};"></div>
+    </div>
+  </div>`).join('');
+
+const surveys = [
+  { id:'srv-1', title:'Engineering Student Experience — 2026', status:'active', questions:7, attempts:364, responses:267, completionRate:73, whatsappLink:'https://wa.me/15550199?text=START_ENGINEERING_2026' },
+  { id:'srv-2', title:'Department Facilities & Lab Equipment Feedback', status:'active', questions:5, attempts:156, responses:103, completionRate:66, whatsappLink:'https://wa.me/15550199?text=START_LAB_FEEDBACK' },
+  { id:'srv-3', title:'Lecturer Evaluation — Harmattan Semester', status:'active', questions:10, attempts:112, responses:86, completionRate:77, whatsappLink:'https://wa.me/15550199?text=START_LECTURER_EVAL' },
+  { id:'srv-4', title:'Campus Wi-Fi & Network Reliability Poll', status:'closed', questions:4, attempts:40, responses:31, completionRate:78, whatsappLink:'https://wa.me/15550199?text=START_WIFI_POLL' },
+];
+document.getElementById('rows').innerHTML = surveys.map(s => `
+  <tr>
+    <td style="font-weight:600;color:var(--text-primary);">${s.title}</td>
+    <td><span class="badge badge-${s.status === 'active' ? 'active' : s.status === 'closed' ? 'closed' : 'draft'}">${s.status === 'active' ? 'Live' : s.status}</span></td>
+    <td>${s.questions}</td>
+    <td>${s.attempts}</td>
+    <td style="font-weight:700;color:var(--green);">${s.responses}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:60px;height:6px;background:var(--bg-input);border-radius:3px;overflow:hidden;">
+          <div style="width:${s.completionRate}%;height:100%;background:var(--green);"></div>
+        </div>
+        <span style="font-size:13px;font-weight:600;">${s.completionRate}%</span>
+      </div>
+    </td>
+    <td><button class="btn btn-secondary btn-sm" style="font-size:12px;padding:4px 10px;" data-link="${s.whatsappLink}">🔗 Copy WA Link</button></td>
+    <td><a href="#" class="btn btn-ghost btn-sm" style="color:var(--purple);font-weight:600;">Results →</a></td>
+  </tr>`).join('');
+
+// Copy-link interaction, same behaviour as the useState version
+document.getElementById('rows').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-link]');
+  if (!btn) return;
+  navigator.clipboard.writeText(btn.dataset.link);
+  btn.textContent = '✓ Copied Link';
+  setTimeout(() => { btn.textContent = '🔗 Copy WA Link'; }, 2000);
+});
+</script>
+</body>
+</html>
