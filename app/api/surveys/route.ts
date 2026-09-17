@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { createClient } from '@/lib/supabase-server'
 
 export async function GET(req: NextRequest) {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  }
+
   try {
     const { data: surveys, error } = await supabase
       .from('surveys')
       .select('*, questions(*, options(*)), responses(count)')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -21,16 +26,29 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  }
+
   try {
     const body = await req.json()
     const { title, description, questions } = body
 
-    // Insert Survey
+    if (!title || typeof title !== 'string' || !title.trim()) {
+      return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+    }
+
     const { data: survey, error: surveyError } = await supabase
       .from('surveys')
       .insert({
+        user_id: user.id,
         title,
-        description,
+        description: description ?? null,
         status: 'active',
       })
       .select()
@@ -38,7 +56,6 @@ export async function POST(req: NextRequest) {
 
     if (surveyError) throw surveyError
 
-    // Insert Questions & Options
     if (questions && questions.length > 0) {
       for (let i = 0; i < questions.length; i++) {
         const q = questions[i]
@@ -61,7 +78,8 @@ export async function POST(req: NextRequest) {
             label: opt,
             value: opt,
           }))
-          await supabase.from('options').insert(optionsData)
+          const { error: optError } = await supabase.from('options').insert(optionsData)
+          if (optError) throw optError
         }
       }
     }

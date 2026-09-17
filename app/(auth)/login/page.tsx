@@ -2,16 +2,49 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
+  const supabase = createClient()
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [info, setInfo] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulated auth flow
-    router.push('/dashboard')
+    setError(null)
+    setInfo(null)
+    setLoading(true)
+
+    if (mode === 'signin') {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      setLoading(false)
+      if (signInError) {
+        setError(signInError.message)
+        return
+      }
+      router.push('/dashboard')
+      router.refresh()
+      return
+    }
+
+    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
+    setLoading(false)
+    if (signUpError) {
+      setError(signUpError.message)
+      return
+    }
+    if (data.session) {
+      router.push('/dashboard')
+      router.refresh()
+      return
+    }
+    setInfo('Account created — check your email to confirm before signing in.')
+    setMode('signin')
   }
 
   return (
@@ -59,11 +92,13 @@ export default function LoginPage() {
             Unify Survey Bot
           </h1>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            Log in to manage your WhatsApp feedback surveys
+            {mode === 'signin'
+              ? 'Log in to manage your WhatsApp feedback surveys'
+              : 'Create a workspace to start building WhatsApp surveys'}
           </p>
         </div>
 
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="form-group">
             <label className="form-label">Email Address</label>
             <input
@@ -84,14 +119,39 @@ export default function LoginPage() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
               required
             />
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}>
-            Sign In to Workspace
+          {error && (
+            <div style={{ fontSize: '13px', color: 'var(--red)' }}>{error}</div>
+          )}
+          {info && (
+            <div style={{ fontSize: '13px', color: 'var(--green)' }}>{info}</div>
+          )}
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}
+            disabled={loading}
+          >
+            {loading ? 'Please wait…' : mode === 'signin' ? 'Sign In to Workspace' : 'Create Workspace'}
           </button>
         </form>
+
+        <button
+          onClick={() => {
+            setMode(mode === 'signin' ? 'signup' : 'signin')
+            setError(null)
+            setInfo(null)
+          }}
+          className="btn btn-ghost"
+          style={{ justifyContent: 'center', fontSize: '13px' }}
+        >
+          {mode === 'signin' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+        </button>
 
         <div style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)' }}>
           Powered by Meta WhatsApp Cloud API & Supabase

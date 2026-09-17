@@ -1,6 +1,24 @@
+import { createHmac, timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { extractMessageText, extractPhoneNumber } from '@/lib/whatsapp'
 import { handleIncomingMessage } from '@/lib/survey-engine'
+
+function isValidSignature(rawBody: string, signatureHeader: string | null): boolean {
+  const appSecret = process.env.WHATSAPP_APP_SECRET
+  if (!appSecret) {
+    console.warn('WHATSAPP_APP_SECRET not set — skipping webhook signature verification.')
+    return true
+  }
+  if (!signatureHeader) return false
+
+  const expected = createHmac('sha256', appSecret).update(rawBody).digest('hex')
+  const provided = signatureHeader.replace('sha256=', '')
+
+  const expectedBuf = Buffer.from(expected, 'hex')
+  const providedBuf = Buffer.from(provided, 'hex')
+  if (expectedBuf.length !== providedBuf.length) return false
+  return timingSafeEqual(expectedBuf, providedBuf)
+}
 
 // GET Handler for Meta Webhook Verification
 export async function GET(req: NextRequest) {
@@ -22,7 +40,14 @@ export async function GET(req: NextRequest) {
 // POST Handler for Inbound WhatsApp Messages
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
+    const rawBody = await req.text()
+
+    if (!isValidSignature(rawBody, req.headers.get('x-hub-signature-256'))) {
+      console.error('Webhook signature verification failed')
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+    }
+
+    const body = JSON.parse(rawBody)
 
     const phoneNumber = extractPhoneNumber(body)
     const messageText = extractMessageText(body)

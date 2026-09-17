@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase'
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: '📊' },
@@ -10,8 +11,16 @@ const navItems = [
   { name: 'Settings', href: '/settings', icon: '⚙️' },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ userEmail }: { userEmail: string | null }) {
   const pathname = usePathname()
+  const router = useRouter()
+  const supabase = createClient()
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+    router.refresh()
+  }
 
   return (
     <aside
@@ -95,7 +104,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer Profile / Campus Badge */}
+      {/* Footer Profile */}
       <div
         style={{
           padding: '16px 20px',
@@ -117,17 +126,21 @@ export default function Sidebar() {
             justifyContent: 'center',
             fontWeight: 700,
             fontSize: '13px',
+            flexShrink: 0,
           }}
         >
-          EG
+          {(userEmail ?? '?').slice(0, 2).toUpperCase()}
         </div>
         <div style={{ flex: 1, overflow: 'hidden' }}>
           <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-            Engineering Admin
+            {userEmail ?? 'Not signed in'}
           </div>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-            WhatsApp Connected
-          </div>
+          <button
+            onClick={handleSignOut}
+            style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'none', padding: 0 }}
+          >
+            Sign out
+          </button>
         </div>
       </div>
     </aside>

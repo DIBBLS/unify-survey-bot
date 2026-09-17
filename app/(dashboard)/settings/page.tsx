@@ -1,18 +1,26 @@
-'use client'
+import { headers } from 'next/headers'
+import CopyButton from '@/components/CopyButton'
 
-import React, { useState } from 'react'
+function isConfigured(name: string) {
+  const value = process.env[name]
+  return Boolean(value && !value.startsWith('placeholder'))
+}
 
 export default function SettingsPage() {
-  const [phoneNumberId, setPhoneNumberId] = useState('')
-  const [accessToken, setAccessToken] = useState('')
-  const [verifyToken, setVerifyToken] = useState('unify_survey_bot_verify_token')
-  const [saved, setSaved] = useState(false)
+  const host = headers().get('host') ?? 'your-site.netlify.app'
+  const protocol = host.startsWith('localhost') ? 'http' : 'https'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`
+  const webhookUrl = `${siteUrl}/api/webhook`
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
-  }
+  const checks = [
+    { label: 'Supabase URL', env: 'NEXT_PUBLIC_SUPABASE_URL' },
+    { label: 'Supabase anon key', env: 'NEXT_PUBLIC_SUPABASE_ANON_KEY' },
+    { label: 'Supabase service role key', env: 'SUPABASE_SERVICE_ROLE_KEY' },
+    { label: 'WhatsApp phone number ID', env: 'WHATSAPP_PHONE_NUMBER_ID' },
+    { label: 'WhatsApp access token', env: 'WHATSAPP_ACCESS_TOKEN' },
+    { label: 'WhatsApp app secret (webhook verification)', env: 'WHATSAPP_APP_SECRET' },
+    { label: 'Public WhatsApp number (wa.me links)', env: 'NEXT_PUBLIC_WHATSAPP_NUMBER' },
+  ]
 
   return (
     <div className="animate-fade-up" style={{ maxWidth: '900px' }}>
@@ -20,71 +28,41 @@ export default function SettingsPage() {
         <div>
           <h1 className="page-title">Settings & Meta Setup</h1>
           <p className="page-subtitle">
-            Configure your Meta WhatsApp Cloud API credentials and webhook integration.
+            Meta WhatsApp Cloud API and Supabase credentials live in environment variables,
+            not in this page — that keeps long-lived secrets out of the database entirely.
           </p>
         </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {/* Credentials Form Card */}
         <div className="glass-card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>
-            Meta Cloud API Credentials
+            Configuration Status
           </h3>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+            Set these in <code style={{ color: 'var(--green)' }}>.env.local</code> for local
+            development, or in your Netlify site's Environment Variables for production.
+            Values themselves are never shown here.
+          </p>
 
-          <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div className="form-group">
-              <label className="form-label">Phone Number ID</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="e.g. 104928104820192"
-                value={phoneNumberId}
-                onChange={(e) => setPhoneNumberId(e.target.value)}
-              />
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                Found in Meta Developer Console under WhatsApp → API Setup
-              </span>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">System User Permanent Access Token</label>
-              <input
-                type="password"
-                className="form-input"
-                placeholder="EAAG..."
-                value={accessToken}
-                onChange={(e) => setAccessToken(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Webhook Verify Token</label>
-              <input
-                type="text"
-                className="form-input"
-                value={verifyToken}
-                onChange={(e) => setVerifyToken(e.target.value)}
-              />
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                Use this token when configuring the Webhook URL in Meta App Console
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
-              <button type="submit" className="btn btn-primary">
-                💾 Save Credentials
-              </button>
-              {saved && (
-                <span style={{ color: 'var(--green)', fontSize: '13px', fontWeight: 600 }}>
-                  ✓ Settings saved!
-                </span>
-              )}
-            </div>
-          </form>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {checks.map((check) => {
+              const configured = isConfigured(check.env)
+              return (
+                <div key={check.env} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)' }}>
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{check.label}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{check.env}</div>
+                  </div>
+                  <span className={`badge badge-${configured ? 'active' : 'closed'}`}>
+                    {configured ? 'Configured' : 'Missing'}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
         </div>
 
-        {/* Webhook Endpoint Info */}
         <div className="glass-card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
             Your Webhook Endpoint URL
@@ -105,19 +83,14 @@ export default function SettingsPage() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              gap: '12px',
             }}
           >
-            <span>https://your-domain.vercel.app/api/webhook</span>
-            <button
-              onClick={() => navigator.clipboard.writeText('https://your-domain.vercel.app/api/webhook')}
-              className="btn btn-ghost btn-sm"
-            >
-              Copy
-            </button>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{webhookUrl}</span>
+            <CopyButton text={webhookUrl} label="Copy" copiedLabel="✓ Copied" className="btn btn-ghost btn-sm" />
           </div>
         </div>
 
-        {/* Quick Meta Setup Guide */}
         <div className="glass-card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
             📖 How to Connect Your WhatsApp Number (Step-by-Step)
@@ -132,13 +105,18 @@ export default function SettingsPage() {
               → Create App → Business Type → Add <strong>WhatsApp</strong> product.
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Add Phone Number:</strong> In WhatsApp → API Setup, connect your test or official WhatsApp Business number.
+              <strong style={{ color: 'var(--text-primary)' }}>Add Phone Number:</strong> In WhatsApp → API Setup, connect your
+              test or official WhatsApp Business number. Copy its Phone Number ID and permanent access
+              token into your environment variables (not this page).
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Configure Webhook:</strong> Go to WhatsApp → Configuration → Edit Webhook. Enter your Vercel URL and Verify Token. Subscribe to <code style={{ color: 'var(--green)' }}>messages</code> events.
+              <strong style={{ color: 'var(--text-primary)' }}>Configure Webhook:</strong> Go to WhatsApp → Configuration → Edit
+              Webhook. Enter the URL above and your <code style={{ color: 'var(--green)' }}>WHATSAPP_VERIFY_TOKEN</code>.
+              Subscribe to <code style={{ color: 'var(--green)' }}>messages</code> events.
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Test Your Survey:</strong> Send your WhatsApp link to any student or phone number and watch responses flow into your dashboard live!
+              <strong style={{ color: 'var(--text-primary)' }}>Test Your Survey:</strong> Send your WhatsApp link to any
+              student or phone number and watch responses flow into your dashboard live.
             </li>
           </ol>
         </div>

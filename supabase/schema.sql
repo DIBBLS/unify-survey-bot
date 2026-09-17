@@ -75,10 +75,64 @@ alter table public.sessions enable row level security;
 alter table public.responses enable row level security;
 alter table public.answers enable row level security;
 
--- Public read access policies for service role API
-create policy "Allow all service role operations" on public.surveys for all using (true);
-create policy "Allow all service role operations" on public.questions for all using (true);
-create policy "Allow all service role operations" on public.options for all using (true);
-create policy "Allow all service role operations" on public.sessions for all using (true);
-create policy "Allow all service role operations" on public.responses for all using (true);
-create policy "Allow all service role operations" on public.answers for all using (true);
+-- Ownership-scoped policies. The WhatsApp bot (app/api/webhook, lib/survey-engine.ts)
+-- talks to Postgres with the service-role key, which bypasses RLS entirely — these
+-- policies only govern what a signed-in dashboard user (anon key + session) can see.
+
+create policy "Owners manage their surveys" on public.surveys
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+create policy "Owners manage questions on their surveys" on public.questions
+  for all using (
+    exists (
+      select 1 from public.surveys
+      where surveys.id = questions.survey_id and surveys.user_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.surveys
+      where surveys.id = questions.survey_id and surveys.user_id = auth.uid()
+    )
+  );
+
+create policy "Owners manage options on their questions" on public.options
+  for all using (
+    exists (
+      select 1 from public.questions
+      join public.surveys on surveys.id = questions.survey_id
+      where questions.id = options.question_id and surveys.user_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.questions
+      join public.surveys on surveys.id = questions.survey_id
+      where questions.id = options.question_id and surveys.user_id = auth.uid()
+    )
+  );
+
+create policy "Owners view sessions on their surveys" on public.sessions
+  for select using (
+    exists (
+      select 1 from public.surveys
+      where surveys.id = sessions.survey_id and surveys.user_id = auth.uid()
+    )
+  );
+
+create policy "Owners view responses on their surveys" on public.responses
+  for select using (
+    exists (
+      select 1 from public.surveys
+      where surveys.id = responses.survey_id and surveys.user_id = auth.uid()
+    )
+  );
+
+create policy "Owners view answers on their responses" on public.answers
+  for select using (
+    exists (
+      select 1 from public.responses
+      join public.surveys on surveys.id = responses.survey_id
+      where responses.id = answers.response_id and surveys.user_id = auth.uid()
+    )
+  );
