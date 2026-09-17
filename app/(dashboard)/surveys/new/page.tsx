@@ -30,6 +30,8 @@ export default function NewSurveyPage() {
     },
   ])
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0)
+  const [publishing, setPublishing] = useState(false)
+  const [publishError, setPublishError] = useState<string | null>(null)
 
   const addQuestion = () => {
     const newQ: DraftQuestion = {
@@ -78,14 +80,42 @@ export default function NewSurveyPage() {
 
   const currentQ = questions[activeQuestionIndex] || questions[0]
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!title.trim()) {
-      alert('Please enter a survey title')
+      setPublishError('Please enter a survey title')
       return
     }
-    // Simulate publish and navigate to surveys list
-    alert('🎉 Survey Published Successfully!\nWhatsApp link generated.')
-    router.push('/surveys')
+    if (questions.some((q) => !q.text.trim())) {
+      setPublishError('Every question needs text')
+      return
+    }
+
+    setPublishing(true)
+    setPublishError(null)
+
+    try {
+      const res = await fetch('/api/surveys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          description,
+          questions: questions.map((q) => ({
+            text: q.text,
+            type: q.type,
+            options: q.type === 'choice' ? q.options : [],
+          })),
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to publish survey')
+
+      router.push(`/surveys/${data.survey.id}`)
+    } catch (err: any) {
+      setPublishError(err.message)
+      setPublishing(false)
+    }
   }
 
   return (
@@ -98,13 +128,18 @@ export default function NewSurveyPage() {
           </Link>
           <h1 className="page-title">Create WhatsApp Survey</h1>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button onClick={() => router.push('/surveys')} className="btn btn-secondary">
-            Save Draft
-          </button>
-          <button onClick={handlePublish} className="btn btn-primary">
-            🚀 Publish Survey Bot
-          </button>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={() => router.push('/surveys')} className="btn btn-secondary" disabled={publishing}>
+              Cancel
+            </button>
+            <button onClick={handlePublish} className="btn btn-primary" disabled={publishing}>
+              {publishing ? 'Publishing…' : '🚀 Publish Survey Bot'}
+            </button>
+          </div>
+          {publishError && (
+            <div style={{ fontSize: '13px', color: 'var(--red)' }}>{publishError}</div>
+          )}
         </div>
       </div>
 
