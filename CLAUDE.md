@@ -21,7 +21,7 @@ more often than a link to a web form.
 - Next.js 14 (App Router), React 18, TypeScript
 - Supabase (Postgres + Auth) for storage and dashboard login
 - Meta WhatsApp Cloud API for messaging
-- Deploys to **Netlify** (`netlify.toml` + `@netlify/plugin-nextjs`)
+- Deploys to **Vercel** (zero-config for Next.js — no plugin or build settings needed)
 - **Plain CSS with design tokens.** No Tailwind, no CSS modules, no UI
   library. `recharts` is in `package.json` but is not imported anywhere —
   the charts on `/dashboard` are hand-built CSS bars.
@@ -183,9 +183,9 @@ real values before expecting anything beyond the login page to work:
 4. Set `NEXT_PUBLIC_WHATSAPP_NUMBER` to the actual WhatsApp number
    (digits only) respondents will message — not the phone number id.
 
-**Deploying to Netlify:** connect the repo, Netlify picks up
-`netlify.toml` and `@netlify/plugin-nextjs` automatically. Set every
-variable from `.env.example` in Site settings → Environment variables
-(use the real deployed URL for `NEXT_PUBLIC_SITE_URL`), then point the
-Meta webhook config at `https://<your-site>.netlify.app/api/webhook`
-(the exact value is also shown on the `/settings` page once deployed).
+**Deploying to Vercel:** import the repo at vercel.com — it auto-detects
+Next.js, no build settings to touch. Set every variable from
+`.env.example` in Project settings → Environment Variables (use the real
+deployed URL for `NEXT_PUBLIC_SITE_URL`), then point the Meta webhook
+config at `https://<your-project>.vercel.app/api/webhook` (the exact
+value is also shown on the `/settings` page once deployed).
