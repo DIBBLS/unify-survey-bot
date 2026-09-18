@@ -5,10 +5,12 @@ import {
   sendListMessage,
 } from './whatsapp'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 export async function handleIncomingMessage(
   phoneNumber: string,
@@ -16,6 +18,7 @@ export async function handleIncomingMessage(
   surveyId?: string
 ) {
   if (!messageText) return
+  const supabase = getSupabase()
 
   // Check for active session
   const { data: session } = await supabase
@@ -114,6 +117,7 @@ export async function handleIncomingMessage(
 }
 
 async function startSurvey(phoneNumber: string, surveyId: string) {
+  const supabase = getSupabase()
   const { data: survey } = await supabase
     .from('surveys')
     .select('*, questions(*, options(*))')
