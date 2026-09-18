@@ -7,7 +7,7 @@ function isConfigured(name: string) {
 }
 
 export default function SettingsPage() {
-  const host = headers().get('host') ?? 'your-site.netlify.app'
+  const host = headers().get('host') ?? 'your-project.vercel.app'
   const protocol = host.startsWith('localhost') ? 'http' : 'https'
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`
   const webhookUrl = `${siteUrl}/api/webhook`
@@ -41,7 +41,7 @@ export default function SettingsPage() {
           </h3>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             Set these in <code style={{ color: 'var(--green)' }}>.env.local</code> for local
-            development, or in your Netlify site's Environment Variables for production.
+            development, or in your Vercel project's Environment Variables for production.
             Values themselves are never shown here.
           </p>
 
