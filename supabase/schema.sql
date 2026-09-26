@@ -61,6 +61,17 @@ create table public.answers (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 7. Webhook Rate Limits (fixed-window counter, one row per phone number —
+-- guards the webhook against a single sender, bug or abuse, hammering the
+-- DB-write + outbound-WhatsApp-send path faster than a real respondent
+-- ever would; not meant to be perfectly race-proof, just cheap and good
+-- enough at this scale)
+create table if not exists public.webhook_rate_limits (
+  phone_number text primary key,
+  window_start timestamp with time zone not null default timezone('utc'::text, now()),
+  message_count integer not null default 1
+);
+
 -- Indexes for lightning fast lookups
 create index idx_sessions_phone on public.sessions(phone_number, completed_at);
 create index idx_questions_survey on public.questions(survey_id, "order");
@@ -74,6 +85,7 @@ alter table public.options enable row level security;
 alter table public.sessions enable row level security;
 alter table public.responses enable row level security;
 alter table public.answers enable row level security;
+alter table public.webhook_rate_limits enable row level security;
 
 -- Ownership-scoped policies. The WhatsApp bot (app/api/webhook, lib/survey-engine.ts)
 -- talks to Postgres with the service-role key, which bypasses RLS entirely — these
@@ -136,3 +148,7 @@ create policy "Owners view answers on their responses" on public.answers
       where responses.id = answers.response_id and surveys.user_id = auth.uid()
     )
   );
+
+-- webhook_rate_limits gets no policy at all: only the service role ever
+-- touches it, so with RLS enabled and no grant, the anon/authenticated
+-- roles simply can't see it.
