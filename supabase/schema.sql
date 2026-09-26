@@ -61,6 +61,15 @@ create table public.answers (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- 7. Processed Messages Table (idempotency guard for WhatsApp webhook retries —
+-- Meta redelivers the same message id if it doesn't get a fast 2xx response;
+-- rows here are never read back, only inserted-and-checked-for-conflict, and
+-- grow unboundedly by design — cheap enough to leave unpruned at this scale)
+create table if not exists public.processed_messages (
+  id text primary key,
+  received_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Indexes for lightning fast lookups
 create index idx_sessions_phone on public.sessions(phone_number, completed_at);
 create index idx_questions_survey on public.questions(survey_id, "order");
@@ -74,10 +83,13 @@ alter table public.options enable row level security;
 alter table public.sessions enable row level security;
 alter table public.responses enable row level security;
 alter table public.answers enable row level security;
+alter table public.processed_messages enable row level security;
 
 -- Ownership-scoped policies. The WhatsApp bot (app/api/webhook, lib/survey-engine.ts)
 -- talks to Postgres with the service-role key, which bypasses RLS entirely — these
 -- policies only govern what a signed-in dashboard user (anon key + session) can see.
+-- processed_messages gets no policy at all: only the service role ever touches it,
+-- so with RLS enabled and no grant, the anon/authenticated roles simply can't see it.
 
 create policy "Owners manage their surveys" on public.surveys
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);

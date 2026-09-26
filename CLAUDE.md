@@ -33,7 +33,8 @@ WhatsApp user
    │  message
    ▼
 app/api/webhook/route.ts     GET = Meta verification handshake
-   │                         POST = inbound messages (signature-checked)
+   │                         POST = inbound messages (signature-checked,
+   │                         deduped against processed_messages)
    ▼
 lib/survey-engine.ts         the state machine: reads session,
    │                         saves the previous answer, sends next Q
@@ -72,7 +73,7 @@ against the wrong question.
 | Database schema | **Real.** `supabase/schema.sql`, RLS scoped by `auth.uid()`. |
 | WhatsApp send helpers | **Real.** `lib/whatsapp.ts` |
 | Conversation engine | **Real.** `lib/survey-engine.ts` |
-| Webhook endpoint | **Real**, signature-verified. `app/api/webhook/route.ts` |
+| Webhook endpoint | **Real**, signature-verified and idempotent (dedupes retried deliveries by WhatsApp message id — see `processed_messages`). `app/api/webhook/route.ts` |
 | Auth | **Real.** Supabase Auth (email/password), `middleware.ts` protects `/dashboard`, `/surveys`, `/settings`. |
 | Surveys API | **Real**, auth-scoped. `app/api/surveys/route.ts` (list/create) + `[id]/route.ts` (get/patch/delete). |
 | All 6 dashboard screens | **Real.** Server components pulling live Supabase data via `lib/queries.ts`. |
@@ -112,12 +113,19 @@ as all-zero.
    `supabase/schema.sql` into the SQL editor before anything will work,
    including sign-up (the `surveys` table's RLS policies reference
    `auth.uid()`, which only resolves once a session exists — signing up
-   itself doesn't need the schema, but creating a survey does).
+   itself doesn't need the schema, but creating a survey does). If you
+   already ran an earlier version of this file, re-running the whole
+   thing will fail on the first `create table` (relation already
+   exists) — apply just the new statements by hand instead (the
+   `processed_messages` table is written with `if not exists` for
+   exactly this reason; the older tables aren't, so don't re-paste the
+   full file over an existing project).
 
-4. **No production hardening beyond RLS + webhook signature checks.**
-   Not implemented: rate limiting on the webhook, WhatsApp's 24-hour
-   session-messaging window / message templates for re-engaging
-   respondents after that window closes, or multi-admin support per
+4. **No production hardening beyond RLS, webhook signature checks, and
+   delivery-retry idempotency.** Not implemented: volumetric rate
+   limiting on the webhook, WhatsApp's 24-hour session-messaging window
+   / message templates for re-engaging respondents after that window
+   closes, or multi-admin support per
    workspace (one Supabase Auth user = one owner of their surveys, no
    sharing).
 
@@ -157,9 +165,10 @@ genuinely left, in rough priority order for taking this to real users:
 2. **Multi-admin workspaces.** Right now one Supabase Auth user owns
    their surveys outright; there's no concept of inviting a co-founder
    to the same workspace.
-3. **Rate limiting on `app/api/webhook/route.ts`.** Signature
-   verification stops forged requests; it doesn't stop a compromised
-   or misbehaving Meta-side retry storm.
+3. **Volumetric rate limiting on `app/api/webhook/route.ts`.** Signature
+   verification stops forged requests, and `processed_messages` (see
+   below) stops a retried delivery from being reprocessed — neither
+   stops a high-volume flood of distinct, validly-signed requests.
 4. **Survey editing after publish.** `PATCH /api/surveys/[id]` exists
    (status changes, title/description), but there's no UI for it and no
    way to edit questions after a survey has responses (arguably correct

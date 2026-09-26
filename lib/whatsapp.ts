@@ -105,3 +105,11 @@ export function extractPhoneNumber(body: any): string | null {
     return null
   }
 }
+
+export function extractMessageId(body: any): string | null {
+  try {
+    return body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.id ?? null
+  } catch {
+    return null
+  }
+}
