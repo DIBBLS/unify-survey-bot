@@ -39,8 +39,8 @@ export default function SettingsPage() {
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>
             Configuration Status
           </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            Set these in <code style={{ color: 'var(--green)' }}>.env.local</code> for local
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+            Set these in <code style={{ color: 'var(--green-text)' }}>.env.local</code> for local
             development, or in your Vercel project's Environment Variables for production.
             Values themselves are never shown here.
           </p>
@@ -49,9 +49,9 @@ export default function SettingsPage() {
             {checks.map((check) => {
               const configured = isConfigured(check.env)
               return (
-                <div key={check.env} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 'var(--radius-md)' }}>
+                <div key={check.env} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--tag-bg)', borderRadius: 'var(--radius-md)' }}>
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{check.label}</div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>{check.label}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{check.env}</div>
                   </div>
                   <span className={`badge badge-${configured ? 'active' : 'closed'}`}>
@@ -67,19 +67,19 @@ export default function SettingsPage() {
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
             Your Webhook Endpoint URL
           </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
             Paste this URL into your Meta WhatsApp App Configuration:
           </p>
 
           <div
             style={{
-              background: 'var(--bg-surface)',
+              background: 'var(--surface-2)',
               padding: '12px 16px',
               borderRadius: 'var(--radius-md)',
               border: '1px solid var(--border)',
               fontFamily: 'monospace',
               fontSize: '13px',
-              color: 'var(--green)',
+              color: 'var(--green-text)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
@@ -96,26 +96,26 @@ export default function SettingsPage() {
             📖 How to Connect Your WhatsApp Number (Step-by-Step)
           </h3>
 
-          <ol style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: '20px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+          <ol style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: '20px', fontSize: '14px', color: 'var(--text-muted)' }}>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Create a Meta App:</strong> Go to{' '}
-              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" style={{ color: 'var(--green)', textDecoration: 'underline' }}>
+              <strong style={{ color: 'var(--text)' }}>Create a Meta App:</strong> Go to{' '}
+              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" style={{ color: 'var(--green-text)', textDecoration: 'underline' }}>
                 developers.facebook.com
               </a>{' '}
               → Create App → Business Type → Add <strong>WhatsApp</strong> product.
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Add Phone Number:</strong> In WhatsApp → API Setup, connect your
+              <strong style={{ color: 'var(--text)' }}>Add Phone Number:</strong> In WhatsApp → API Setup, connect your
               test or official WhatsApp Business number. Copy its Phone Number ID and permanent access
               token into your environment variables (not this page).
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Configure Webhook:</strong> Go to WhatsApp → Configuration → Edit
-              Webhook. Enter the URL above and your <code style={{ color: 'var(--green)' }}>WHATSAPP_VERIFY_TOKEN</code>.
-              Subscribe to <code style={{ color: 'var(--green)' }}>messages</code> events.
+              <strong style={{ color: 'var(--text)' }}>Configure Webhook:</strong> Go to WhatsApp → Configuration → Edit
+              Webhook. Enter the URL above and your <code style={{ color: 'var(--green-text)' }}>WHATSAPP_VERIFY_TOKEN</code>.
+              Subscribe to <code style={{ color: 'var(--green-text)' }}>messages</code> events.
             </li>
             <li>
-              <strong style={{ color: 'var(--text-primary)' }}>Test Your Survey:</strong> Send your WhatsApp link to any
+              <strong style={{ color: 'var(--text)' }}>Test Your Survey:</strong> Send your WhatsApp link to any
               student or phone number and watch responses flow into your dashboard live.
             </li>
           </ol>

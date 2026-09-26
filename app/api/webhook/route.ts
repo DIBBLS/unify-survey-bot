@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { extractMessageText, extractPhoneNumber } from '@/lib/whatsapp'
+import { extractMessageText, extractPhoneNumber, extractMessageId } from '@/lib/whatsapp'
 import { handleIncomingMessage } from '@/lib/survey-engine'
 
 function isValidSignature(rawBody: string, signatureHeader: string | null): boolean {
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
 
     const phoneNumber = extractPhoneNumber(body)
     const messageText = extractMessageText(body)
+    const messageId = extractMessageId(body)
 
     if (phoneNumber && messageText) {
       console.log(`📩 Incoming message from ${phoneNumber}: "${messageText}"`)
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Process message through Survey Engine
-      await handleIncomingMessage(phoneNumber, messageText, surveyId)
+      await handleIncomingMessage(phoneNumber, messageText, surveyId, messageId)
     }
 
     return NextResponse.json({ status: 'success' }, { status: 200 })

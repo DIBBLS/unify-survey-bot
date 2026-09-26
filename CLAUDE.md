@@ -33,7 +33,9 @@ WhatsApp user
    │  message
    ▼
 app/api/webhook/route.ts     GET = Meta verification handshake
-   │                         POST = inbound messages (signature-checked)
+   │                         POST = inbound messages (signature-checked,
+   │                         deduped against processed_messages,
+   │                         rate-limited per phone number)
    ▼
 lib/survey-engine.ts         the state machine: reads session,
    │                         saves the previous answer, sends next Q
@@ -72,7 +74,7 @@ against the wrong question.
 | Database schema | **Real.** `supabase/schema.sql`, RLS scoped by `auth.uid()`. |
 | WhatsApp send helpers | **Real.** `lib/whatsapp.ts` |
 | Conversation engine | **Real.** `lib/survey-engine.ts` |
-| Webhook endpoint | **Real**, signature-verified. `app/api/webhook/route.ts` |
+| Webhook endpoint | **Real**, signature-verified, idempotent (dedupes retried deliveries by WhatsApp message id — see `processed_messages`), and rate-limited per phone number (see `webhook_rate_limits`). `app/api/webhook/route.ts` |
 | Auth | **Real.** Supabase Auth (email/password), `middleware.ts` protects `/dashboard`, `/surveys`, `/settings`. |
 | Surveys API | **Real**, auth-scoped. `app/api/surveys/route.ts` (list/create) + `[id]/route.ts` (get/patch/delete). |
 | All 6 dashboard screens | **Real.** Server components pulling live Supabase data via `lib/queries.ts`. |
@@ -112,27 +114,52 @@ as all-zero.
    `supabase/schema.sql` into the SQL editor before anything will work,
    including sign-up (the `surveys` table's RLS policies reference
    `auth.uid()`, which only resolves once a session exists — signing up
-   itself doesn't need the schema, but creating a survey does).
+   itself doesn't need the schema, but creating a survey does). If you
+   already ran an earlier version of this file, re-running the whole
+   thing will fail on the first `create table` (relation already
+   exists) — apply just the new statements by hand instead (both the
+   `processed_messages` and `webhook_rate_limits` tables are written
+   with `if not exists` for exactly this reason; the older tables
+   aren't, so don't re-paste the full file over an existing project).
 
-4. **No production hardening beyond RLS + webhook signature checks.**
-   Not implemented: rate limiting on the webhook, WhatsApp's 24-hour
-   session-messaging window / message templates for re-engaging
-   respondents after that window closes, or multi-admin support per
-   workspace (one Supabase Auth user = one owner of their surveys, no
-   sharing).
+4. **No production hardening beyond RLS, webhook signature checks,
+   delivery-retry idempotency, and a per-phone-number rate limit.** The
+   idempotency guard (`processed_messages`) dedupes Meta's own retried
+   deliveries of the *same* message; the rate limit (`webhook_rate_limits`,
+   checked in `lib/survey-engine.ts`) separately caps how fast one sender
+   can drive DB writes + outbound WhatsApp sends. Neither defends against
+   a flood of *distinct* forged requests (already moot: those fail
+   signature verification before touching the DB at all). Also not
+   implemented: WhatsApp's 24-hour session-messaging window / message
+   templates for re-engaging respondents after that window closes, or
+   multi-admin support per workspace (one Supabase Auth user = one owner
+   of their surveys, no sharing).
 
 ## Styling rules
 
-All styling flows through CSS custom properties defined at the top of
+This app follows the **Unify brand kit** — the same design tokens as the
+main Unify product (Playfair Display for display type, DM Sans for body,
+a single green accent used surgically, no purple/blue accent hues). All
+styling flows through CSS custom properties defined at the top of
 `app/globals.css`. Inline styles reference them as `var(--green)`,
-`var(--text-secondary)`, etc.
+`var(--text-muted)`, etc. See `globals.css` for the full token list
+(`--bg`, `--surface`, `--surface-2`, `--border`, `--border-strong`,
+`--text`, `--text-muted`, `--text-subtle`, `--green` family, `--tag-bg`,
+spacing/radius/shadow scales).
 
 **Never hardcode a hex colour in a component.** Add or reuse a token.
 Changing the palette should require editing only `globals.css`.
 
-Reusable classes already defined: `.glass-card`, `.btn` (`.btn-primary`,
-`.btn-secondary`, `.btn-ghost`, `.btn-danger`, `.btn-sm`, `.btn-lg`),
-`.badge` (`.badge-active`, `.badge-draft`, `.badge-closed`),
+**No per-card accent colours.** Stat cards, badges, and charts do not
+assign a different hue per item (no purple/blue/amber-as-decoration) —
+green is the only accent, used for genuinely positive/active states.
+Big numbers (`.stat-value`) are always near-black, not colour-coded.
+
+Reusable classes already defined: `.glass-card`, `.hero-banner` (dark
+inverted banner for page intros), `.wordmark` (brand logotype — `Unify`
+followed by `<span class="dot">.</span>`), `.btn` (`.btn-primary`,
+`.btn-hero`, `.btn-secondary`, `.btn-ghost`, `.btn-danger`, `.btn-sm`,
+`.btn-lg`), `.badge` (`.badge-active`, `.badge-draft`, `.badge-closed`),
 `.stat-card`, `.data-table`, `.form-input`, `.form-select`,
 `.form-label`, `.page-header`, `.page-title`, `.stats-grid`,
 `.empty-state`, `.animate-fade-up`.
@@ -157,15 +184,18 @@ genuinely left, in rough priority order for taking this to real users:
 2. **Multi-admin workspaces.** Right now one Supabase Auth user owns
    their surveys outright; there's no concept of inviting a co-founder
    to the same workspace.
-3. **Rate limiting on `app/api/webhook/route.ts`.** Signature
-   verification stops forged requests; it doesn't stop a compromised
-   or misbehaving Meta-side retry storm.
-4. **Survey editing after publish.** `PATCH /api/surveys/[id]` exists
-   (status changes, title/description), but there's no UI for it and no
-   way to edit questions after a survey has responses (arguably correct
-   — changing questions under live respondents would corrupt the
-   `current_question_index` invariant — but worth a deliberate decision
-   rather than silent omission).
+3. **Cross-sender volumetric rate limiting on `app/api/webhook/route.ts`.**
+   Signature verification stops forged requests, `processed_messages`
+   stops a retried delivery from being reprocessed, and
+   `webhook_rate_limits` caps how fast any *one* phone number can drive
+   the endpoint — none of these stop a high-volume flood spread across
+   many *distinct*, validly-signed senders.
+4. **Editing survey questions after publish.** `PATCH /api/surveys/[id]`
+   now has a UI (title/description/status — see `SurveyEditPanel`), but
+   there's still no way to edit questions after a survey has responses
+   (arguably correct — changing questions under live respondents would
+   corrupt the `current_question_index` invariant — but worth a
+   deliberate decision rather than silent omission).
 
 ## Running it
 

@@ -30,7 +30,7 @@ export default function Sidebar({ userEmail }: { userEmail: string | null }) {
         top: 0,
         left: 0,
         bottom: 0,
-        background: 'var(--bg-surface)',
+        background: 'var(--surface)',
         borderRight: '1px solid var(--border)',
         display: 'flex',
         flexDirection: 'column',
@@ -48,30 +48,13 @@ export default function Sidebar({ userEmail }: { userEmail: string | null }) {
           borderBottom: '1px solid var(--border)',
         }}
       >
-        <div
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#000',
-            fontWeight: 800,
-            fontSize: '18px',
-            boxShadow: '0 0 16px var(--green-glow)',
-          }}
-        >
-          U
-        </div>
-        <div>
-          <div style={{ fontWeight: 800, fontSize: '16px', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-            Unify
-          </div>
-          <div style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+          <span className="wordmark" style={{ fontSize: '20px', lineHeight: '20px', color: 'var(--text)' }}>
+            Unify<span className="dot">.</span>
+          </span>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '4px' }}>
             Survey Bot
-          </div>
+          </span>
         </div>
       </div>
 
@@ -91,9 +74,9 @@ export default function Sidebar({ userEmail }: { userEmail: string | null }) {
                 borderRadius: 'var(--radius-md)',
                 fontSize: '14px',
                 fontWeight: isActive ? 600 : 500,
-                color: isActive ? 'var(--green)' : 'var(--text-secondary)',
-                background: isActive ? 'var(--green-dim)' : 'transparent',
-                border: isActive ? '1px solid rgba(37,211,102,0.2)' : '1px solid transparent',
+                color: isActive ? 'var(--green-text)' : 'var(--text-muted)',
+                background: isActive ? 'var(--green-tint)' : 'transparent',
+                border: isActive ? '1px solid var(--green-tint-border)' : '1px solid transparent',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -119,8 +102,8 @@ export default function Sidebar({ userEmail }: { userEmail: string | null }) {
             width: '32px',
             height: '32px',
             borderRadius: '50%',
-            background: 'var(--purple-dim)',
-            color: 'var(--purple)',
+            background: 'var(--tag-bg)',
+            color: 'var(--text-muted)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -132,7 +115,7 @@ export default function Sidebar({ userEmail }: { userEmail: string | null }) {
           {(userEmail ?? '?').slice(0, 2).toUpperCase()}
         </div>
         <div style={{ flex: 1, overflow: 'hidden' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
             {userEmail ?? 'Not signed in'}
           </div>
           <button
