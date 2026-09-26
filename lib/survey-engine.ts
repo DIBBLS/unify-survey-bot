@@ -12,6 +12,44 @@ function getSupabase() {
   )
 }
 
+const RATE_LIMIT_WINDOW_MS = 60_000
+const RATE_LIMIT_MAX_MESSAGES = 20
+
+// Fixed-window counter, one row per phone number. Not perfectly race-safe
+// under concurrent retries for the same sender (a rare double-increment is
+// harmless here) — this only needs to catch a runaway loop or abuse, not
+// bill anything precisely.
+async function isRateLimited(
+  supabase: ReturnType<typeof getSupabase>,
+  phoneNumber: string
+): Promise<boolean> {
+  const { data: row } = await supabase
+    .from('webhook_rate_limits')
+    .select('window_start, message_count')
+    .eq('phone_number', phoneNumber)
+    .single()
+
+  const windowExpired = !row || Date.now() - new Date(row.window_start).getTime() > RATE_LIMIT_WINDOW_MS
+
+  if (windowExpired) {
+    await supabase
+      .from('webhook_rate_limits')
+      .upsert({ phone_number: phoneNumber, window_start: new Date().toISOString(), message_count: 1 })
+    return false
+  }
+
+  if (row.message_count >= RATE_LIMIT_MAX_MESSAGES) {
+    return true
+  }
+
+  await supabase
+    .from('webhook_rate_limits')
+    .update({ message_count: row.message_count + 1 })
+    .eq('phone_number', phoneNumber)
+
+  return false
+}
+
 export async function handleIncomingMessage(
   phoneNumber: string,
   messageText: string | null,
@@ -30,6 +68,11 @@ export async function handleIncomingMessage(
     // (its Cloud API retries on a slow or non-2xx response). Reprocessing it
     // would double-insert the answer and double-advance current_question_index.
     if (dedupeError?.code === '23505') return
+  }
+
+  if (await isRateLimited(supabase, phoneNumber)) {
+    console.warn(`Rate limit exceeded for ${phoneNumber} — dropping message`)
+    return
   }
 
   // Check for active session

@@ -34,7 +34,8 @@ WhatsApp user
    ▼
 app/api/webhook/route.ts     GET = Meta verification handshake
    │                         POST = inbound messages (signature-checked,
-   │                         deduped against processed_messages)
+   │                         deduped against processed_messages,
+   │                         rate-limited per phone number)
    ▼
 lib/survey-engine.ts         the state machine: reads session,
    │                         saves the previous answer, sends next Q
@@ -73,7 +74,7 @@ against the wrong question.
 | Database schema | **Real.** `supabase/schema.sql`, RLS scoped by `auth.uid()`. |
 | WhatsApp send helpers | **Real.** `lib/whatsapp.ts` |
 | Conversation engine | **Real.** `lib/survey-engine.ts` |
-| Webhook endpoint | **Real**, signature-verified and idempotent (dedupes retried deliveries by WhatsApp message id — see `processed_messages`). `app/api/webhook/route.ts` |
+| Webhook endpoint | **Real**, signature-verified, idempotent (dedupes retried deliveries by WhatsApp message id — see `processed_messages`), and rate-limited per phone number (see `webhook_rate_limits`). `app/api/webhook/route.ts` |
 | Auth | **Real.** Supabase Auth (email/password), `middleware.ts` protects `/dashboard`, `/surveys`, `/settings`. |
 | Surveys API | **Real**, auth-scoped. `app/api/surveys/route.ts` (list/create) + `[id]/route.ts` (get/patch/delete). |
 | All 6 dashboard screens | **Real.** Server components pulling live Supabase data via `lib/queries.ts`. |
@@ -116,18 +117,23 @@ as all-zero.
    itself doesn't need the schema, but creating a survey does). If you
    already ran an earlier version of this file, re-running the whole
    thing will fail on the first `create table` (relation already
-   exists) — apply just the new statements by hand instead (the
-   `processed_messages` table is written with `if not exists` for
-   exactly this reason; the older tables aren't, so don't re-paste the
-   full file over an existing project).
+   exists) — apply just the new statements by hand instead (both the
+   `processed_messages` and `webhook_rate_limits` tables are written
+   with `if not exists` for exactly this reason; the older tables
+   aren't, so don't re-paste the full file over an existing project).
 
-4. **No production hardening beyond RLS, webhook signature checks, and
-   delivery-retry idempotency.** Not implemented: volumetric rate
-   limiting on the webhook, WhatsApp's 24-hour session-messaging window
-   / message templates for re-engaging respondents after that window
-   closes, or multi-admin support per
-   workspace (one Supabase Auth user = one owner of their surveys, no
-   sharing).
+4. **No production hardening beyond RLS, webhook signature checks,
+   delivery-retry idempotency, and a per-phone-number rate limit.** The
+   idempotency guard (`processed_messages`) dedupes Meta's own retried
+   deliveries of the *same* message; the rate limit (`webhook_rate_limits`,
+   checked in `lib/survey-engine.ts`) separately caps how fast one sender
+   can drive DB writes + outbound WhatsApp sends. Neither defends against
+   a flood of *distinct* forged requests (already moot: those fail
+   signature verification before touching the DB at all). Also not
+   implemented: WhatsApp's 24-hour session-messaging window / message
+   templates for re-engaging respondents after that window closes, or
+   multi-admin support per workspace (one Supabase Auth user = one owner
+   of their surveys, no sharing).
 
 ## Styling rules
 
@@ -178,16 +184,18 @@ genuinely left, in rough priority order for taking this to real users:
 2. **Multi-admin workspaces.** Right now one Supabase Auth user owns
    their surveys outright; there's no concept of inviting a co-founder
    to the same workspace.
-3. **Volumetric rate limiting on `app/api/webhook/route.ts`.** Signature
-   verification stops forged requests, and `processed_messages` (see
-   below) stops a retried delivery from being reprocessed — neither
-   stops a high-volume flood of distinct, validly-signed requests.
-4. **Survey editing after publish.** `PATCH /api/surveys/[id]` exists
-   (status changes, title/description), but there's no UI for it and no
-   way to edit questions after a survey has responses (arguably correct
-   — changing questions under live respondents would corrupt the
-   `current_question_index` invariant — but worth a deliberate decision
-   rather than silent omission).
+3. **Cross-sender volumetric rate limiting on `app/api/webhook/route.ts`.**
+   Signature verification stops forged requests, `processed_messages`
+   stops a retried delivery from being reprocessed, and
+   `webhook_rate_limits` caps how fast any *one* phone number can drive
+   the endpoint — none of these stop a high-volume flood spread across
+   many *distinct*, validly-signed senders.
+4. **Editing survey questions after publish.** `PATCH /api/surveys/[id]`
+   now has a UI (title/description/status — see `SurveyEditPanel`), but
+   there's still no way to edit questions after a survey has responses
+   (arguably correct — changing questions under live respondents would
+   corrupt the `current_question_index` invariant — but worth a
+   deliberate decision rather than silent omission).
 
 ## Running it
 
