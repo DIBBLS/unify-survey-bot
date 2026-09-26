@@ -15,10 +15,22 @@ function getSupabase() {
 export async function handleIncomingMessage(
   phoneNumber: string,
   messageText: string | null,
-  surveyId?: string
+  surveyId?: string,
+  messageId?: string | null
 ) {
   if (!messageText) return
   const supabase = getSupabase()
+
+  if (messageId) {
+    const { error: dedupeError } = await supabase
+      .from('processed_messages')
+      .insert({ id: messageId })
+
+    // Postgres unique_violation — Meta already delivered this message once
+    // (its Cloud API retries on a slow or non-2xx response). Reprocessing it
+    // would double-insert the answer and double-advance current_question_index.
+    if (dedupeError?.code === '23505') return
+  }
 
   // Check for active session
   const { data: session } = await supabase
