@@ -123,16 +123,29 @@ as all-zero.
 
 ## Styling rules
 
-All styling flows through CSS custom properties defined at the top of
+This app follows the **Unify brand kit** — the same design tokens as the
+main Unify product (Playfair Display for display type, DM Sans for body,
+a single green accent used surgically, no purple/blue accent hues). All
+styling flows through CSS custom properties defined at the top of
 `app/globals.css`. Inline styles reference them as `var(--green)`,
-`var(--text-secondary)`, etc.
+`var(--text-muted)`, etc. See `globals.css` for the full token list
+(`--bg`, `--surface`, `--surface-2`, `--border`, `--border-strong`,
+`--text`, `--text-muted`, `--text-subtle`, `--green` family, `--tag-bg`,
+spacing/radius/shadow scales).
 
 **Never hardcode a hex colour in a component.** Add or reuse a token.
 Changing the palette should require editing only `globals.css`.
 
-Reusable classes already defined: `.glass-card`, `.btn` (`.btn-primary`,
-`.btn-secondary`, `.btn-ghost`, `.btn-danger`, `.btn-sm`, `.btn-lg`),
-`.badge` (`.badge-active`, `.badge-draft`, `.badge-closed`),
+**No per-card accent colours.** Stat cards, badges, and charts do not
+assign a different hue per item (no purple/blue/amber-as-decoration) —
+green is the only accent, used for genuinely positive/active states.
+Big numbers (`.stat-value`) are always near-black, not colour-coded.
+
+Reusable classes already defined: `.glass-card`, `.hero-banner` (dark
+inverted banner for page intros), `.wordmark` (brand logotype — `Unify`
+followed by `<span class="dot">.</span>`), `.btn` (`.btn-primary`,
+`.btn-hero`, `.btn-secondary`, `.btn-ghost`, `.btn-danger`, `.btn-sm`,
+`.btn-lg`), `.badge` (`.badge-active`, `.badge-draft`, `.badge-closed`),
 `.stat-card`, `.data-table`, `.form-input`, `.form-select`,
 `.form-label`, `.page-header`, `.page-title`, `.stats-grid`,
 `.empty-state`, `.animate-fade-up`.

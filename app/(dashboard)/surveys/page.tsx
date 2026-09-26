@@ -52,10 +52,10 @@ export default async function SurveysPage({
               className="btn btn-ghost btn-sm"
               style={{
                 textTransform: 'capitalize',
-                color: isActive ? 'var(--green)' : 'var(--text-secondary)',
+                color: isActive ? 'var(--green-text)' : 'var(--text-muted)',
                 fontWeight: isActive ? 700 : 500,
-                background: isActive ? 'var(--green-dim)' : 'transparent',
-                border: isActive ? '1px solid rgba(37,211,102,0.2)' : '1px solid transparent',
+                background: isActive ? 'var(--green-tint)' : 'transparent',
+                border: isActive ? '1px solid var(--green-tint-border)' : '1px solid transparent',
               }}
             >
               {tab} {tab === 'all' ? `(${allSurveys.length})` : ''}
@@ -93,10 +93,10 @@ export default async function SurveysPage({
                   </span>
                 </div>
 
-                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '6px', color: 'var(--text-primary)' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '6px', color: 'var(--text)' }}>
                   {survey.title}
                 </h3>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px', lineHeight: 1.5 }}>
                   {survey.description || 'No description'}
                 </p>
               </div>
@@ -108,7 +108,7 @@ export default async function SurveysPage({
                     gridTemplateColumns: 'repeat(3, 1fr)',
                     gap: '8px',
                     padding: '12px',
-                    background: 'var(--bg-input)',
+                    background: 'var(--tag-bg)',
                     borderRadius: 'var(--radius-md)',
                     marginBottom: '20px',
                     textAlign: 'center',
@@ -116,19 +116,19 @@ export default async function SurveysPage({
                 >
                   <div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Questions</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
                       {survey.questionsCount}
                     </div>
                   </div>
                   <div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Responses</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--green)' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--green-text)' }}>
                       {survey.completed}
                     </div>
                   </div>
                   <div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Completion</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--purple)' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
                       {survey.completionRate}%
                     </div>
                   </div>

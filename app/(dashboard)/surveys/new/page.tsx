@@ -123,7 +123,7 @@ export default function NewSurveyPage() {
       {/* Header */}
       <div className="page-header">
         <div>
-          <Link href="/surveys" style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'inline-block', marginBottom: '4px' }}>
+          <Link href="/surveys" style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'inline-block', marginBottom: '4px' }}>
             ← Back to Surveys
           </Link>
           <h1 className="page-title">Create WhatsApp Survey</h1>
@@ -195,9 +195,9 @@ export default function NewSurveyPage() {
                   onClick={() => setActiveQuestionIndex(idx)}
                   className="btn btn-sm"
                   style={{
-                    background: activeQuestionIndex === idx ? 'var(--green-dim)' : 'var(--bg-input)',
-                    color: activeQuestionIndex === idx ? 'var(--green)' : 'var(--text-secondary)',
-                    border: activeQuestionIndex === idx ? '1px solid rgba(37,211,102,0.3)' : '1px solid transparent',
+                    background: activeQuestionIndex === idx ? 'var(--green-tint)' : 'var(--tag-bg)',
+                    color: activeQuestionIndex === idx ? 'var(--green-text)' : 'var(--text-muted)',
+                    border: activeQuestionIndex === idx ? '1px solid var(--green-tint-border)' : '1px solid transparent',
                   }}
                 >
                   Q{idx + 1}
@@ -207,9 +207,9 @@ export default function NewSurveyPage() {
 
             {/* Active Question Editor */}
             {currentQ && (
-              <div style={{ background: 'var(--bg-surface)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+              <div style={{ background: 'var(--surface-2)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--green)' }}>
+                  <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--green-text)' }}>
                     Question #{activeQuestionIndex + 1}
                   </span>
                   {questions.length > 1 && (

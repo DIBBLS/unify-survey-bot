@@ -76,7 +76,7 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'var(--bg-base)',
+        background: 'var(--bg)',
         padding: '20px',
       }}
     >
@@ -92,28 +92,13 @@ export default function LoginPage() {
         }}
       >
         <div style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-              color: '#000',
-              fontWeight: 800,
-              fontSize: '24px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px auto',
-              boxShadow: '0 0 24px var(--green-glow)',
-            }}
-          >
-            U
+          <div className="wordmark" style={{ fontSize: '32px', lineHeight: '32px', marginBottom: '12px' }}>
+            Unify<span className="dot">.</span>
           </div>
-          <h1 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)' }}>
-            Unify Survey Bot
+          <h1 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-muted)' }}>
+            Survey Bot
           </h1>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
             {mode === 'signin'
               ? 'Log in to manage your WhatsApp feedback surveys'
               : 'Create a workspace to start building WhatsApp surveys'}
@@ -175,7 +160,7 @@ export default function LoginPage() {
           {mode === 'signin' ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
         </button>
 
-        <div style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)' }}>
+        <div style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-subtle)' }}>
           Powered by Meta WhatsApp Cloud API & Supabase
         </div>
       </div>

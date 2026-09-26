@@ -35,47 +35,44 @@ export default async function DashboardPage() {
 
   return (
     <div className="animate-fade-up">
-      <div className="page-header">
+      <div className="hero-banner">
         <div>
-          <h1 className="page-title">Workspace Overview</h1>
-          <p className="page-subtitle">
-            Real-time survey performance and WhatsApp respondent engagement.
-          </p>
+          <div className="eyebrow hero-eyebrow">Workspace Overview</div>
+          <h1>Every response, straight from WhatsApp.</h1>
+          <p>Real-time survey performance and respondent engagement, no web form required.</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <Link href="/surveys/new" className="btn btn-primary">
-            ➕ Create Survey
-          </Link>
-        </div>
+        <Link href="/surveys/new" className="btn btn-hero">
+          ➕ Create Survey
+        </Link>
       </div>
 
       <div className="stats-grid">
-        <div className="glass-card stat-card green">
+        <div className="glass-card stat-card">
           <div className="stat-label">Completed Responses</div>
           <div className="stat-value">{totalResponses}</div>
-          <div className="stat-change">{responsesThisWeek} in the last 7 days</div>
+          <div className="stat-change positive">{responsesThisWeek} in the last 7 days</div>
         </div>
 
-        <div className="glass-card stat-card purple">
+        <div className="glass-card stat-card">
           <div className="stat-label">Avg. Completion Rate</div>
           <div className="stat-value">{avgCompletionRate}%</div>
-          <div className="stat-change" style={{ color: 'var(--purple)' }}>
+          <div className="stat-change">
             Across {surveys.length} survey{surveys.length === 1 ? '' : 's'}
           </div>
         </div>
 
-        <div className="glass-card stat-card blue">
+        <div className="glass-card stat-card">
           <div className="stat-label">Active Surveys</div>
           <div className="stat-value">{activeSurveys}</div>
-          <div className="stat-change" style={{ color: 'var(--blue)' }}>
+          <div className="stat-change">
             100% automated via WhatsApp
           </div>
         </div>
 
-        <div className="glass-card stat-card amber">
+        <div className="glass-card stat-card">
           <div className="stat-label">Avg. Completion Time</div>
           <div className="stat-value">{avgSeconds !== null ? formatDuration(avgSeconds) : '—'}</div>
-          <div className="stat-change" style={{ color: 'var(--amber)' }}>
+          <div className="stat-change">
             ⚡ Instant WhatsApp responses
           </div>
         </div>
@@ -100,7 +97,7 @@ export default async function DashboardPage() {
           >
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: 700 }}>Response Activity</h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
                 Completed responses over the last 7 days
               </p>
             </div>
@@ -110,15 +107,14 @@ export default async function DashboardPage() {
           <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '16px', paddingTop: '20px' }}>
             {activity.map((bar, i) => (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', height: '100%', justifyContent: 'flex-end' }}>
-                <div style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600 }}>{bar.count}</div>
+                <div style={{ fontSize: '11px', color: 'var(--green-text)', fontWeight: 600 }}>{bar.count}</div>
                 <div
                   style={{
                     width: '100%',
                     maxWidth: '40px',
                     height: `${Math.max((bar.count / maxActivity) * 100, 4)}%`,
-                    background: 'linear-gradient(180deg, var(--green) 0%, rgba(37,211,102,0.1) 100%)',
+                    background: 'linear-gradient(180deg, var(--green) 0%, rgba(74,222,128,0.12) 100%)',
                     borderRadius: '6px 6px 0 0',
-                    boxShadow: bar.count > 0 ? '0 0 12px var(--green-glow)' : 'none',
                   }}
                 />
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{bar.day}</div>
@@ -129,7 +125,7 @@ export default async function DashboardPage() {
 
         <div className="glass-card" style={{ padding: '24px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '4px' }}>Recent Responses</h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px' }}>
             Latest activity across all surveys
           </p>
 
@@ -140,7 +136,7 @@ export default async function DashboardPage() {
               {recent.map((r) => (
                 <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
                   <div style={{ overflow: 'hidden' }}>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                       {r.surveyTitle}
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -168,7 +164,7 @@ export default async function DashboardPage() {
         >
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 700 }}>My Surveys</h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
               Manage active WhatsApp entry points and track completion.
             </p>
           </div>
@@ -205,7 +201,7 @@ export default async function DashboardPage() {
             <tbody>
               {surveys.slice(0, 5).map((survey) => (
                 <tr key={survey.id}>
-                  <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{survey.title}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--text)' }}>{survey.title}</td>
                   <td>
                     <span className={`badge badge-${survey.status === 'active' ? 'active' : survey.status === 'closed' ? 'closed' : 'draft'}`}>
                       {survey.status === 'active' ? 'Live' : survey.status}
@@ -213,10 +209,10 @@ export default async function DashboardPage() {
                   </td>
                   <td>{survey.questionsCount}</td>
                   <td>{survey.attempts}</td>
-                  <td style={{ fontWeight: 700, color: 'var(--green)' }}>{survey.completed}</td>
+                  <td style={{ fontWeight: 700, color: 'var(--green-text)' }}>{survey.completed}</td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '60px', height: '6px', background: 'var(--bg-input)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: '60px', height: '6px', background: 'var(--tag-bg)', borderRadius: '3px', overflow: 'hidden' }}>
                         <div style={{ width: `${survey.completionRate}%`, height: '100%', background: 'var(--green)' }} />
                       </div>
                       <span style={{ fontSize: '13px', fontWeight: 600 }}>{survey.completionRate}%</span>
@@ -226,7 +222,7 @@ export default async function DashboardPage() {
                     <CopyButton text={whatsAppLink(survey.id)} style={{ fontSize: '12px', padding: '4px 10px' }} />
                   </td>
                   <td>
-                    <Link href={`/surveys/${survey.id}`} className="btn btn-ghost btn-sm" style={{ color: 'var(--purple)', fontWeight: 600 }}>
+                    <Link href={`/surveys/${survey.id}`} className="btn btn-ghost btn-sm" style={{ fontWeight: 600 }}>
                       Results →
                     </Link>
                   </td>
