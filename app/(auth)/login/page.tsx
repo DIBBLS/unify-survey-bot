@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const AUTH_TIMEOUT_MS = 15000
 
@@ -78,8 +79,13 @@ export default function LoginPage() {
         justifyContent: 'center',
         background: 'var(--bg)',
         padding: '20px',
+        position: 'relative',
       }}
     >
+      <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
+        <ThemeToggle />
+      </div>
+
       <div
         className="glass-card animate-fade-up"
         style={{
