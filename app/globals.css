@@ -38,8 +38,10 @@
   --invert-accent: #4ade80;
   --invert-border: #1f1f1f;
 
-  /* Fixed regardless of theme */
+  /* Neutral tag/chip background — varies by theme, unlike the two below */
   --tag-bg: #f0efeb;
+
+  /* Fixed regardless of theme */
   --near-black: #0a0a0a;
   --off-white: #f5f4f0;
 
@@ -74,6 +76,85 @@
   /* Layout */
   --sidebar-width: 240px;
   --topbar-height: 64px;
+}
+
+/* ─── Dark theme ────────────────────────────────────────────────────
+   Default is "auto" (follows prefers-color-scheme) unless a toggle has
+   set data-theme explicitly — see components/ThemeToggle.tsx. Only the
+   tokens that actually change between themes are listed here; --green,
+   --on-green, --amber, --red, --near-black and --off-white are the same
+   in both themes by design (see tokens.json). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface-2: #222222;
+    --border: #2a2a2a;
+    --border-strong: #77766f;
+
+    --text: #f0efeb;
+    --text-muted: #aaaaaa;
+    --text-subtle: #666666;
+
+    --green-deep: #4ade80;
+    --green-text: #4ade80;
+    --green-tint: rgba(74, 222, 128, 0.14);
+    --green-tint-border: rgba(74, 222, 128, 0.35);
+
+    --amber-tint: rgba(251, 191, 36, 0.12);
+
+    --red-text: #ef4444;
+    --red-tint: rgba(239, 68, 68, 0.12);
+
+    /* Hero banners flip to light-on-dark-page so they still stand out */
+    --invert-bg: #f0efeb;
+    --invert-text: #0a0a0a;
+    --invert-muted: #555555;
+    --invert-accent: #166534;
+    --invert-border: #e0deda;
+
+    --tag-bg: #2a2a2a;
+
+    --shadow-card: none;
+    --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+    --shadow-drawer: -4px 0 24px rgba(0, 0, 0, 0.5);
+    --shadow-toast: 0 8px 32px rgba(0, 0, 0, 0.6);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface-2: #222222;
+  --border: #2a2a2a;
+  --border-strong: #77766f;
+
+  --text: #f0efeb;
+  --text-muted: #aaaaaa;
+  --text-subtle: #666666;
+
+  --green-deep: #4ade80;
+  --green-text: #4ade80;
+  --green-tint: rgba(74, 222, 128, 0.14);
+  --green-tint-border: rgba(74, 222, 128, 0.35);
+
+  --amber-tint: rgba(251, 191, 36, 0.12);
+
+  --red-text: #ef4444;
+  --red-tint: rgba(239, 68, 68, 0.12);
+
+  --invert-bg: #f0efeb;
+  --invert-text: #0a0a0a;
+  --invert-muted: #555555;
+  --invert-accent: #166534;
+  --invert-border: #e0deda;
+
+  --tag-bg: #2a2a2a;
+
+  --shadow-card: none;
+  --shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-drawer: -4px 0 24px rgba(0, 0, 0, 0.5);
+  --shadow-toast: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 /* ─── Reset ─────────────────────────────────────────────────────── */

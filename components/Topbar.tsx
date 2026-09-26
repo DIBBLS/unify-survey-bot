@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import ThemeToggle from './ThemeToggle'
 
 export default function Topbar() {
   return (
@@ -27,6 +28,7 @@ export default function Topbar() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <ThemeToggle />
         <Link href="/surveys/new" className="btn btn-primary btn-sm">
           <span>⚡ Create Survey</span>
         </Link>
