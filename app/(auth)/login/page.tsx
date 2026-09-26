@@ -4,6 +4,17 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
+const AUTH_TIMEOUT_MS = 15000
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error("That took too long — Supabase may be unreachable. Please try again.")), ms)
+    }),
+  ])
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -21,31 +32,41 @@ export default function LoginPage() {
 
     const supabase = createClient()
 
-    if (mode === 'signin') {
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-      setLoading(false)
-      if (signInError) {
-        setError(signInError.message)
+    try {
+      if (mode === 'signin') {
+        const { error: signInError } = await withTimeout(
+          supabase.auth.signInWithPassword({ email, password }),
+          AUTH_TIMEOUT_MS
+        )
+        if (signInError) {
+          setError(signInError.message)
+          return
+        }
+        router.push('/dashboard')
+        router.refresh()
         return
       }
-      router.push('/dashboard')
-      router.refresh()
-      return
-    }
 
-    const { data, error: signUpError } = await supabase.auth.signUp({ email, password })
-    setLoading(false)
-    if (signUpError) {
-      setError(signUpError.message)
-      return
+      const { data, error: signUpError } = await withTimeout(
+        supabase.auth.signUp({ email, password }),
+        AUTH_TIMEOUT_MS
+      )
+      if (signUpError) {
+        setError(signUpError.message)
+        return
+      }
+      if (data.session) {
+        router.push('/dashboard')
+        router.refresh()
+        return
+      }
+      setInfo('Account created — check your email to confirm before signing in.')
+      setMode('signin')
+    } catch (err: any) {
+      setError(err?.message || 'Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
     }
-    if (data.session) {
-      router.push('/dashboard')
-      router.refresh()
-      return
-    }
-    setInfo('Account created — check your email to confirm before signing in.')
-    setMode('signin')
   }
 
   return (
