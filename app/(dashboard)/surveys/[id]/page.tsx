@@ -5,6 +5,7 @@ import { getSurveyDetail } from '@/lib/queries'
 import { formatDuration, whatsAppLink } from '@/lib/format'
 import CopyButton from '@/components/CopyButton'
 import PrintButton from '@/components/PrintButton'
+import SurveyEditPanel from '@/components/SurveyEditPanel'
 
 const BAR_COLORS = ['var(--green-deep)', 'var(--green)', 'var(--border-strong)', 'var(--text-subtle)']
 
@@ -25,13 +26,12 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
           <Link href="/surveys" style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'inline-block', marginBottom: '4px' }}>
             ← Back to Surveys
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <h1 className="page-title">{survey.title}</h1>
-            <span className={`badge badge-${survey.status === 'active' ? 'active' : survey.status === 'closed' ? 'closed' : 'draft'}`}>
-              {survey.status === 'active' ? 'Live Bot' : survey.status}
-            </span>
-          </div>
-          <p className="page-subtitle">{survey.description || 'No description'}</p>
+          <SurveyEditPanel
+            surveyId={survey.id}
+            initialTitle={survey.title}
+            initialDescription={survey.description}
+            initialStatus={survey.status}
+          />
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <CopyButton text={whatsAppLink(survey.id)} label="🔗 Share WA Link" copiedLabel="✓ Copied!" />
