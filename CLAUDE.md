@@ -92,12 +92,15 @@ as all-zero.
 
 ## Known traps
 
-1. **`NEXT_PUBLIC_WHATSAPP_NUMBER` and `WHATSAPP_PHONE_NUMBER_ID` are
-   two different values from the Meta console — don't swap them.** The
-   first is the public WhatsApp number and builds the `wa.me` links
-   respondents click; the second is the internal id the Cloud API uses
-   to send messages. Mixing them up produces working `wa.me` links that
-   open a different WhatsApp number than the one the bot listens on.
+1. **`WHATSAPP_NUMBER` and `WHATSAPP_PHONE_NUMBER_ID` are two different
+   values from the Meta console — don't swap them.** The first is the
+   public WhatsApp number and builds the `wa.me` links respondents
+   click; the second is the internal id the Cloud API uses to send
+   messages. Mixing them up produces working `wa.me` links that open a
+   different WhatsApp number than the one the bot listens on.
+   `WHATSAPP_NUMBER` has no `NEXT_PUBLIC_` prefix on purpose — it's only
+   ever read server-side, so it doesn't need to be bundled into client
+   JS (even though the number itself is already public in every link).
 
 2. **`.env.local` holds placeholders in a fresh checkout.** See
    `.env.example` for the full list. Until real Supabase + Meta values
@@ -180,8 +183,8 @@ real values before expecting anything beyond the login page to work:
    locally (or check your inbox after signing up).
 3. Create a Meta app with the WhatsApp product, grab the phone number
    id, access token, and app secret, and pick a `WHATSAPP_VERIFY_TOKEN`.
-4. Set `NEXT_PUBLIC_WHATSAPP_NUMBER` to the actual WhatsApp number
-   (digits only) respondents will message — not the phone number id.
+4. Set `WHATSAPP_NUMBER` to the actual WhatsApp number (digits only)
+   respondents will message — not the phone number id.
 
 **Deploying to Vercel:** import the repo at vercel.com — it auto-detects
 Next.js, no build settings to touch. Set every variable from
