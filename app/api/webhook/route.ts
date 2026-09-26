@@ -64,6 +64,13 @@ export async function POST(req: NextRequest) {
 
       // Process message through Survey Engine
       await handleIncomingMessage(phoneNumber, messageText, surveyId, messageId)
+    } else {
+      // Meta also posts delivery/read receipts and other non-message
+      // events to this same webhook — this is expected for those. If
+      // you were expecting a reply and see this instead of the 📩 log
+      // above, the request reached us but didn't parse as an inbound
+      // text/interactive message; check the logged payload shape.
+      console.log('Webhook received a non-message event:', JSON.stringify(body))
     }
 
     return NextResponse.json({ status: 'success' }, { status: 200 })

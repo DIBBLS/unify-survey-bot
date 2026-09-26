@@ -2,21 +2,29 @@ const WHATSAPP_API_URL = 'https://graph.facebook.com/v19.0'
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID!
 const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN!
 
-export async function sendTextMessage(to: string, text: string) {
+// Meta's Graph API returns a 200 with a JSON error body or a non-2xx status
+// on failure (expired/invalid access token, wrong phone number id, unverified
+// test recipient, etc.) — fetch() doesn't throw for either, so without this
+// check a failed send is completely invisible: the webhook still acks 200 to
+// Meta, and the respondent just never gets a reply.
+async function postMessage(payload: Record<string, unknown>) {
   const res = await fetch(`${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${ACCESS_TOKEN}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'text',
-      text: { body: text },
-    }),
+    body: JSON.stringify({ messaging_product: 'whatsapp', ...payload }),
   })
-  return res.json()
+  const data = await res.json()
+  if (!res.ok || data.error) {
+    console.error(`WhatsApp send failed (HTTP ${res.status}):`, JSON.stringify(data))
+  }
+  return data
+}
+
+export async function sendTextMessage(to: string, text: string) {
+  return postMessage({ to, type: 'text', text: { body: text } })
 }
 
 export async function sendButtonMessage(
@@ -25,29 +33,20 @@ export async function sendButtonMessage(
   buttons: { id: string; title: string }[]
 ) {
   // WhatsApp interactive buttons (max 3)
-  const res = await fetch(`${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${ACCESS_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'interactive',
-      interactive: {
-        type: 'button',
-        body: { text: bodyText },
-        action: {
-          buttons: buttons.map((b) => ({
-            type: 'reply',
-            reply: { id: b.id, title: b.title },
-          })),
-        },
+  return postMessage({
+    to,
+    type: 'interactive',
+    interactive: {
+      type: 'button',
+      body: { text: bodyText },
+      action: {
+        buttons: buttons.map((b) => ({
+          type: 'reply',
+          reply: { id: b.id, title: b.title },
+        })),
       },
-    }),
+    },
   })
-  return res.json()
 }
 
 export async function sendListMessage(
@@ -57,27 +56,18 @@ export async function sendListMessage(
   sections: { title: string; rows: { id: string; title: string }[] }[]
 ) {
   // For >3 options, use a list message
-  const res = await fetch(`${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${ACCESS_TOKEN}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to,
-      type: 'interactive',
-      interactive: {
-        type: 'list',
-        body: { text: bodyText },
-        action: {
-          button: buttonLabel,
-          sections,
-        },
+  return postMessage({
+    to,
+    type: 'interactive',
+    interactive: {
+      type: 'list',
+      body: { text: bodyText },
+      action: {
+        button: buttonLabel,
+        sections,
       },
-    }),
+    },
   })
-  return res.json()
 }
 
 export function extractMessageText(body: any): string | null {
