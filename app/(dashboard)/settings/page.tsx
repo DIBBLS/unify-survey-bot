@@ -19,7 +19,7 @@ export default function SettingsPage() {
     { label: 'WhatsApp phone number ID', env: 'WHATSAPP_PHONE_NUMBER_ID' },
     { label: 'WhatsApp access token', env: 'WHATSAPP_ACCESS_TOKEN' },
     { label: 'WhatsApp app secret (webhook verification)', env: 'WHATSAPP_APP_SECRET' },
-    { label: 'Public WhatsApp number (wa.me links)', env: 'NEXT_PUBLIC_WHATSAPP_NUMBER' },
+    { label: 'Public WhatsApp number (wa.me links)', env: 'WHATSAPP_NUMBER' },
   ]
 
   return (

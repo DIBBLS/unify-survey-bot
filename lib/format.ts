@@ -28,6 +28,6 @@ export function maskPhone(raw: string): string {
 }
 
 export function whatsAppLink(surveyId: string): string {
-  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ''
+  const number = process.env.WHATSAPP_NUMBER || ''
   return `https://wa.me/${number}?text=${encodeURIComponent(`START_${surveyId}`)}`
 }
