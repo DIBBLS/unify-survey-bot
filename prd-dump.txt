@@ -1,0 +1,345 @@
+[Heading1] WhatsApp Survey Bot — PRD
+[] Sep 20, 2026 · @Someone
+[Heading2] Overview
+[] This product lets anyone run a survey inside WhatsApp, so people answer one question at a time in a chat instead of opening a Google Form.
+[] A creator signs up on the website, builds a survey, publishes it, and shares the bot's WhatsApp contact or link with their audience. When a respondent taps Start, the bot asks the questions in turn, and every answer lands in the creator's dashboard. If a respondent stops halfway, the bot sends a reminder.
+[] The UI, core functionality and super admin controls are already built. This PRD defines what "finished" means so the full-stack developer can close the remaining gaps and harden the product for launch, while the founder focuses on marketing and distribution.
+[Quote] Working title: "WhatsApp Survey Bot". Replace with the final product name.
+[Heading2] Problem
+[] Most people never finish a survey that makes them leave WhatsApp, and the ones who do are pulled out of what they were doing.
+[] Today a survey sent over WhatsApp means: tap a link, wait for a browser, load a form, fill it in, then find your way back to the chat. Each step loses people. The interruption also breaks the person's flow on their phone, so many simply ignore the message. Creators end up with low response rates and no easy way to nudge the people who meant to answer.
+[] The conversation already happens in WhatsApp. The survey should happen there too: tap Start, tap an answer, done in about 30 seconds, with the bot reminding people who forget.
+[Heading2] Goals and non-goals
+[] The goal of this release is a product that a creator can use end to end, and a respondent can finish, without anyone fixing things in the background.
+[] Goals
+[ListParagraph] A respondent completes a survey entirely inside WhatsApp, with no account and no browser.
+[ListParagraph] A creator can sign up, build, publish, share and read results without help from the team.
+[ListParagraph] Good UI
+[ListParagraph] Reminders lift completion without annoying people.
+[ListParagraph] Responses are recorded accurately: no lost answers, no duplicates, correct completion status.
+[ListParagraph] The product is stable enough for a real pilot with an outside organization.
+[] Non-goals for this release
+[ListParagraph] Channels other than WhatsApp.
+[ListParagraph] Advanced analytics such as cross-tabulation (see Later).
+[ListParagraph] Branching or skip logic (see Later).
+[Heading2] Users and use cases
+[] There are two kinds of users: creators, who build and send surveys, and respondents, who answer them. Respondents need no account, only WhatsApp.
+[] Creator segment
+[] Example uses
+[] Schools and universities
+[] Student feedback, course evaluations, class polls, event registration, attendance, department surveys
+[] Businesses
+[] Customer feedback, product research, lead qualification, satisfaction scores, market research
+[] Organizations and communities
+[] Event registration, member surveys, community feedback, volunteer sign-up
+[] Researchers
+[] Questionnaires, participant screening, recruitment
+[] Individuals
+[] RSVPs, group decisions, personal polls
+[] The first pilot audience is the founder's own network, including LASU students. Launch language and any localization are open questions (see Risks and open questions).
+[Heading2] Product scope
+[] The product is three parts working together, and all three must work for a launch.
+[] Part
+[] Used by
+[] What it does
+[] Survey builder (website)
+[] Creators
+[] Create an account, build and edit surveys, publish, and get the WhatsApp link to share
+[] WhatsApp respondent experience (bot)
+[] Respondents
+[] Deliver the survey question by question in chat, record answers, send reminders
+[] Analytics and admin dashboard
+[] Creators and the platform admin
+[] Show responses and completion, export data, and let the admin control accounts, surveys and the bot
+[] The positioning is not "a better Google Form". The product removes the gap between where people already talk (WhatsApp) and where organizations collect information.
+[Heading2] Core user journeys
+[] Both journeys must work start to finish with no manual fixing in the background. They are also the basis of the launch test in the Launch readiness section.
+[] Creator
+[ListParagraph] Sign up and log in.
+[ListParagraph] Create a survey: name it, add questions, set required or optional, reorder, preview.
+[ListParagraph] Publish. The system generates the WhatsApp link and contact for this survey.
+[ListParagraph] Share the link with the target audience, for example in a WhatsApp group.
+[ListParagraph] Watch responses arrive in the dashboard.
+[ListParagraph] Analyze results and export the data.
+[] Respondent
+[ListParagraph] Receive the link or contact in WhatsApp.
+[ListParagraph] Tap it and press Start in the bot chat.
+[ListParagraph] Read the intro (who is asking, how many questions, how long it takes).
+[ListParagraph] Answer each question by tapping a button or a list item, or typing a short reply.
+[ListParagraph] See a thank-you message at the end.
+[ListParagraph] If they stop midway, get a reminder and resume where they left off.
+[Code] stateDiagram-v2    [*] --> Started: taps Start    Started --> InProgress: answers Q1    InProgress --> Completed: answers last question    InProgress --> Abandoned: no reply after reminders    InProgress --> OptedOut: replies STOP    Abandoned --> InProgress: replies later    Completed --> [*]
+[] Each respondent has one of these statuses per survey, and the dashboard's completion numbers come from them.
+[Heading2] Survey builder requirements
+[] P0 means it must work before launch; P1 means it should ship soon after. Priorities are proposed, so adjust them. Since the product is already built, each row is a check: confirm it works, fix it if not.
+[] Requirement
+[] Priority
+[] Done when
+[] Sign up, log in, log out, password reset
+[] P0
+[] A new creator can register and recover access without help
+[] Create, edit, duplicate survey
+[] P0
+[] Changes save and never corrupt responses already collected
+[] Delete or archive survey
+[] P0
+[] Archived surveys stop accepting responses; data stays exportable
+[] Question types: multiple choice, yes/no, short text, rating
+[] P0
+[] Each type renders and records correctly in WhatsApp
+[] Poll as a multiple-choice question
+[] P0
+[] A one-question survey works as a quick poll and records the chosen option
+[] Required and optional questions
+[] P0
+[] Optional questions can be skipped in the bot
+[] Reorder questions
+[] P0
+[] Order in the builder matches order in WhatsApp
+[] Preview
+[] P1
+[] Creator sees roughly how the chat will look before publishing
+[] Publish and unpublish
+[] P0
+[] Unpublished surveys reply with a "survey closed" message
+[] Shareable WhatsApp link and contact for each survey
+[] P0
+[] Tapping the link opens the bot with that survey selected
+[] Live response count on the survey page
+[] P0
+[] Count matches the dashboard
+[] Editing a published survey
+[] P1
+[] Defined rule for what can change once responses exist (see Open questions)
+[] Mobile-responsive builder
+[] P0
+[] Usable on a phone browser
+[Heading2] WhatsApp respondent experience
+[] The respondent opens WhatsApp, taps Start, answers, and is done. No account, no browser, nothing to download. This is the core advantage, so it gets the most testing.
+[] Opening message (sent when the respondent taps Start)
+[Code] Hi! {Creator name} wants you to answer a quick {N}-question survey.It takes about {X} seconds.Question 1/{N}What level are you currently in?[100 Level] [200 Level] [300 Level]
+[] Every question shows its position ("Question 2/5") so people know how far along they are.
+[] How each question type appears
+[] Question type
+[] What the respondent sees
+[] Recorded as
+[] Yes/No
+[] Two tap buttons
+[] The chosen option
+[] Multiple choice, up to 3 options
+[] Tap buttons
+[] The chosen option
+[] Multiple choice, 4 to 10 options
+[] A tap list
+[] The chosen option
+[] Multiple choice, more than 10 options
+[] Numbered text list; respondent types the number
+[] The chosen option
+[] Rating
+[] Numbered scale the respondent taps or types
+[] The number chosen
+[] Short text
+[] Plain prompt; respondent types a reply
+[] The text as typed
+[] The button and list limits come from WhatsApp, not from this product (see WhatsApp platform constraints).
+[] Edge cases the bot must handle
+[] Situation
+[] Expected behavior
+[] Reply does not match the options (typed something else)
+[] Politely say so and re-send the same question; never advance
+[] Optional question
+[] Offer a Skip option
+[] Respondent replies STOP
+[] Confirm, stop all messages, mark as opted out
+[] Respondent replies RESTART
+[] Ask for confirmation, then restart from question 1
+[] Respondent already completed this survey
+[] Thank them and say it is recorded; do not create a second response (default rule: one response per WhatsApp number per survey)
+[] Survey unpublished, archived or deleted
+[] Say the survey is closed; do not ask questions
+[] Unknown or invalid survey code
+[] Say the link is not valid and suggest asking the sender for a new one
+[] Voice note, image or sticker sent to a text question
+[] Ask for a text reply; do not store the media in v1
+[] Respondent returns days later and replies
+[] Resume from the next unanswered question
+[] Same WhatsApp message delivered twice (webhook retry)
+[] Ignore the duplicate; never record an answer twice
+[] Bot or database error mid-survey
+[] Send a friendly "something went wrong, please try again" message; answers already given are kept
+[] The respondent is identified by their WhatsApp number, which the bot receives automatically. Whether creators can see that number is a privacy decision (see Risks and open questions).
+[Heading2] Reminders
+[] Reminders are what make this more than a Google Form inside WhatsApp, and also the easiest way to annoy people, so they need firm limits.
+[] Proposed rules (defaults the creator can change per survey)
+[ListParagraph] Send reminders only to respondents who started but did not finish.
+[ListParagraph] Maximum 2 reminders per respondent per survey.
+[ListParagraph] Wait at least several hours before the first reminder and about a day before the second.
+[ListParagraph] Send only during daytime hours, proposed 8:00 to 20:00 West Africa Time.
+[ListParagraph] Say how many questions remain, for example "You have 3 questions left. It takes under a minute."
+[ListParagraph] Stop immediately when the respondent completes, replies STOP, or the survey closes.
+[ListParagraph] Creators can turn reminders off for a survey.
+[] Example reminder
+[Code] Hi! You haven't finished {Creator name}'s survey yet.You have 3 questions left, about 30 seconds.Reply CONTINUE to pick up where you stopped, or STOP to opt out.
+[] Technical constraint the developer must design around
+[] WhatsApp only allows free-form messages within 24 hours of the respondent's last message. Reminders sent after that window must use a pre-approved message template, which Meta reviews and usually charges for. This means the second reminder (and any reminder after a day) needs an approved template, and message cost becomes a real cost of the product. Confirm the current rules and pricing in Meta's documentation before finalizing the cadence.
+[] Done when: reminders fire on schedule, never exceed the cap, respect opt-out and quiet hours, and resume the survey at the right question.
+[Heading2] Analytics dashboard and export
+[] The dashboard is where the creator gets value from the responses, so its numbers must match what actually happened in the chat.
+[] Feature
+[] Priority
+[] Done when
+[] Survey summary: total responses, completion rate, average completion time
+[] P0
+[] Numbers reconcile with raw response records
+[] Per-question results: count and share for each choice, with a chart
+[] P0
+[] Counts add up to the number of answers to that question
+[] Text answers list for short-text questions
+[] P0
+[] Every typed answer is visible and searchable
+[] Individual responses with timestamp and completion status
+[] P0
+[] Completed, in-progress, abandoned and opted-out are all distinguishable
+[] Drop-off by question
+[] P1
+[] Creator can see where people stop
+[] Export to CSV
+[] P0
+[] File opens correctly in Excel and Google Sheets, one row per respondent
+[] Export to Excel
+[] P1
+[] Same data as CSV with headers
+[] Filters (date range, completion status)
+[] P1
+[] Filters change every number on the page consistently
+[] Source tracking: separate share links per campaign or group
+[] P1
+[] Responses can be split by which link the respondent used
+[] Mobile-responsive dashboard
+[] P0
+[] Readable on a phone browser
+[] Cross-tabulation (for example, answers by faculty) is not needed for launch.
+[Heading2] Super admin and platform controls
+[] Super admin controls already exist. The developer should confirm that each of these works and is protected behind admin-only access.
+[] Control
+[] Purpose
+[] View, search, suspend and reactivate creator accounts
+[] Deal with abuse and support requests
+[] View, unpublish or take down any survey
+[] Stop spam, phishing or harmful surveys quickly
+[] Platform-wide metrics: creators, active surveys, responses, messages sent
+[] Track growth and load
+[] Bot health: connection status, failed sends, delivery errors
+[] Spot outages before creators do
+[] Message and event logs, searchable by survey or WhatsApp number
+[] Debug "it didn't work for me" reports
+[] Limits and quotas: surveys per creator, messages per day, reminders
+[] Control cost and prevent abuse
+[] Audit log of admin actions
+[] Accountability for who changed what
+[] Admin actions must be logged, and a suspended creator's surveys must stop sending messages right away.
+[Heading2] WhatsApp platform constraints
+[] These are the WhatsApp rules that shape the design. They are from general knowledge of the WhatsApp Business Platform and change over time, so the developer must verify each against Meta's current documentation.
+[ListParagraph] Official API only. The bot must run on the WhatsApp Business Platform (Cloud API) with a business number. Automating a normal personal WhatsApp account with unofficial tools breaks WhatsApp's terms and risks the number being banned.
+[ListParagraph] One number, many surveys. If all surveys share one bot number, forwarding the contact alone cannot say which survey the respondent wants. Each survey needs a click-to-chat link with a survey code in the pre-filled message (for example "START ABC123"), or a code the respondent types. Confirm how the current build routes this.
+[ListParagraph] Interactive message limits. Reply buttons are limited to 3 options, and list messages to 10 rows, each with short titles. This drives the rendering rules in the respondent section.
+[ListParagraph] 24-hour window. Free-form replies are allowed only within 24 hours of the respondent's last message. Anything later, including most reminders, needs an approved message template.
+[ListParagraph] Opt-in and opt-out. Respondents opt in by messaging the bot first. Every reminder must offer a way to stop, and STOP must be honored immediately.
+[ListParagraph] Quality and sending limits. Reports and blocks by recipients can lower the number's quality rating and reduce how many messages it may send. This is why reminder caps matter.
+[ListParagraph] Business setup. Meta may require business verification and display-name approval before the number can be used at scale.
+[ListParagraph] Webhook reliability. Incoming messages can arrive twice or out of order. Deduplicate by WhatsApp message ID and keep a stored conversation state per respondent, so a restart or retry never loses or repeats an answer.
+[Heading2] Non-functional requirements
+[] The product handles people's phone numbers and answers, so privacy, security and reliability are launch requirements, not extras.
+[] Privacy and data handling
+[ListParagraph] Collect only what is needed: the WhatsApp number and the answers.
+[ListParagraph] Tell respondents in the opening message who is collecting the data, and link to a privacy notice.
+[ListParagraph] Creators own their survey data; the platform must not share it with other creators.
+[ListParagraph] Support deletion of a respondent's data on request, and define a retention period.
+[ListParagraph] Comply with the Nigeria Data Protection Act. Get legal review of the privacy notice and terms before launch.
+[] Security and abuse protection
+[ListParagraph] Encrypt data in transit and at rest; protect the dashboard and admin panel with authentication and role checks.
+[ListParagraph] Rate-limit account creation, survey creation and bot messages.
+[ListParagraph] Creators accept terms that ban spam, harassment and phishing surveys; admins can take down offenders.
+[ListParagraph] Respondents can report a survey (for example by replying REPORT) so admins see it.
+[ListParagraph] Protect the bot's webhook: verify that requests really come from WhatsApp.
+[] Reliability and quality
+[ListParagraph] The bot replies quickly enough to feel like a chat. Proposed target: a reply within 3 seconds for 95% of messages.
+[ListParagraph] Answers already given are never lost, even if a step fails.
+[ListParagraph] Errors show friendly messages to respondents and are logged for admins.
+[ListParagraph] The website and dashboard work on phone screens.
+[Heading2] Success metrics
+[] The pilot should show that respondents finish surveys in WhatsApp and that the system records them correctly. Targets are proposed starting points; revise them after the first pilot.
+[] Metric
+[] Definition
+[] Pilot target
+[] Completion rate
+[] Completed responses divided by respondents who pressed Start
+[] 70% or higher for a 5-question survey
+[] Median completion time
+[] Start to last answer, for completed responses
+[] Under 60 seconds for 5 questions
+[] Reminder lift
+[] Share of reminded respondents who go on to complete
+[] Track first; set a target after the pilot
+[] Delivery failure rate
+[] Failed sends divided by total sends
+[] Under 2%
+[] Data accuracy
+[] Dashboard counts match raw records in spot checks
+[] 100%
+[] Creator activation
+[] Signed-up creators who publish a survey
+[] Track first; set a target after the pilot
+[] Manual interventions
+[] Times the team had to fix data or state by hand
+[] Zero during the pilot
+[Heading2] Launch readiness
+[] The product is ready to launch when both journeys pass end to end without the team fixing anything in the background, and every P0 item below is checked off.
+[] Must work before launch
+[ListParagraph] ☐ Sign up, log in and password reset
+[ListParagraph] ☐ Create, edit, duplicate, archive and delete surveys
+[ListParagraph] ☐ All P0 question types, required and optional, reordering
+[ListParagraph] ☐ Publish and unpublish; shareable WhatsApp link opens the right survey
+[ListParagraph] ☐ Bot conversation: opening message, every question type, thank-you message
+[ListParagraph] ☐ Every edge case in the respondent section behaves as specified
+[ListParagraph] ☐ Respondent identification and one response per number per survey
+[ListParagraph] ☐ Answers stored correctly; completion status accurate
+[ListParagraph] ☐ Reminders: schedule, cap, quiet hours, opt-out, correct resume point
+[ListParagraph] ☐ Dashboard numbers reconcile with raw records; CSV export opens cleanly
+[ListParagraph] ☐ Super admin controls and audit log
+[ListParagraph] ☐ Error handling with friendly messages; nothing lost on failure
+[ListParagraph] ☐ Mobile-responsive builder and dashboard
+[ListParagraph] ☐ Privacy notice, terms of use, and data deletion process
+[ListParagraph] ☐ Rate limits and spam protection on accounts, surveys and messages
+[ListParagraph] ☐ WhatsApp business number set up, with any needed message templates approved
+[] End-to-end test
+[] The developer runs both journeys on real phones: creator (sign up, create, publish, share, receive responses, analyze) and respondent (receive, start, answer, finish). Also test: a respondent who stops midway and gets reminded, one who replies STOP, one who sends invalid answers, and two people answering at the same moment.
+[] Pilot
+[] Before approaching organizations, run one real 5-question survey with 20 to 50 people from the founder's own network. Measure how many started, how many completed, how long it took, where people dropped off, whether any question was misunderstood, whether WhatsApp delivery and reminders worked, and whether the dashboard recorded everything accurately. Then repeat with one outside organization.
+[Heading2] Risks and open questions
+[] These need a decision from the founder or the developer before or during the finish work.
+[ListParagraph] ☐ Product name. What is the final name, and does the bot display it or the creator's name?
+[ListParagraph] ☐ WhatsApp setup. Is the bot on the official Cloud API with a verified business number, or something else? Who pays for template messages?
+[ListParagraph] ☐ Routing. How does a shared bot number know which survey a respondent wants (link with code, typed code, or a number per survey)?
+[ListParagraph] ☐ Anonymous or identified. Can creators see respondents' phone numbers, or only answers? Should this be a per-survey setting?
+[ListParagraph] ☐ Editing after publish. What may a creator change once responses exist (fix typos only, add questions, reorder)?
+[ListParagraph] ☐ Reminder cadence. Confirm the defaults (2 reminders, daytime only) against Meta's template rules and costs.
+[ListParagraph] ☐ Language. Is the launch English only, or does the bot need Pidgin or other languages?
+[ListParagraph] ☐ Data retention. How long are responses and phone numbers kept, and who can request deletion?
+[ListParagraph] ☐ Pricing and limits. Is the launch free, and what per-creator quotas apply?
+[] Main risks
+[ListParagraph] Message costs and Meta template approval can slow or raise the cost of reminders.
+[ListParagraph] Too many reminders or unwanted messages can get the number flagged and its sending limits reduced.
+[ListParagraph] Abuse (spam or phishing surveys) can damage the bot's reputation with WhatsApp, so takedown must be fast.
+[Heading2] Later (out of scope for v1)
+[] These are good next steps, but they should not delay launch.
+[ListParagraph] Cross-tabulation and deeper analytics (answers split by another question)
+[ListParagraph] Branching and skip logic
+[ListParagraph] Multiple languages
+[ListParagraph] Sending a survey to a contact list through approved templates
+[ListParagraph] Team accounts and roles for organizations
+[ListParagraph] Paid plans and billing
+[ListParagraph] Integrations, such as sending responses to Google Sheets
+[ListParagraph] Image and voice answers
+[ListParagraph] Custom bot branding per organization
+[ListParagraph] Public API and webhooks

@@ -1,131 +1,173 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase'
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase";
 
 const navItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: '📊' },
-  { name: 'Surveys', href: '/surveys', icon: '📋' },
-  { name: 'New Survey', href: '/surveys/new', icon: '➕' },
-  { name: 'Settings', href: '/settings', icon: '⚙️' },
-]
+  { name: "Dashboard", href: "/dashboard", icon: "📊" },
+  { name: "Surveys", href: "/surveys", icon: "📋" },
+  { name: "New Survey", href: "/surveys/new", icon: "➕" },
+  { name: "Settings", href: "/settings", icon: "⚙️" },
+];
 
 export default function Sidebar({ userEmail }: { userEmail: string | null }) {
-  const pathname = usePathname()
-  const router = useRouter()
-  const supabase = createClient()
+  const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
-  }
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <aside
       style={{
-        width: 'var(--sidebar-width)',
-        position: 'fixed',
+        width: "var(--sidebar-width)",
+        position: "fixed",
         top: 0,
         left: 0,
         bottom: 0,
-        background: 'var(--surface)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
+        background: "var(--surface)",
+        borderRight: "1px solid var(--border)",
+        display: "flex",
+        flexDirection: "column",
         zIndex: 50,
       }}
     >
       {/* Brand Header */}
       <div
         style={{
-          height: 'var(--topbar-height)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          padding: '0 20px',
-          borderBottom: '1px solid var(--border)',
+          height: "var(--topbar-height)",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          padding: "0 20px",
+          borderBottom: "1px solid var(--border)",
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-          <span className="wordmark" style={{ fontSize: '20px', lineHeight: '20px', color: 'var(--text)' }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}
+        >
+          <span
+            className="wordmark"
+            style={{
+              fontSize: "20px",
+              lineHeight: "20px",
+              color: "var(--text)",
+            }}
+          >
             Unify<span className="dot">.</span>
           </span>
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500, marginTop: '4px' }}>
+          <span
+            style={{
+              fontSize: "11px",
+              color: "var(--text-muted)",
+              fontWeight: 500,
+              marginTop: "4px",
+            }}
+          >
             Survey Bot
           </span>
         </div>
       </div>
 
       {/* Nav List */}
-      <nav style={{ padding: '20px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <nav
+        style={{
+          padding: "20px 12px",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+        }}
+      >
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href))
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/dashboard" && pathname?.startsWith(item.href));
           return (
             <Link
               key={item.href}
               href={item.href}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '10px 14px',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '14px',
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "10px 14px",
+                borderRadius: "var(--radius-md)",
+                fontSize: "14px",
                 fontWeight: isActive ? 600 : 500,
-                color: isActive ? 'var(--green-text)' : 'var(--text-muted)',
-                background: isActive ? 'var(--green-tint)' : 'transparent',
-                border: isActive ? '1px solid var(--green-tint-border)' : '1px solid transparent',
-                transition: 'all 0.2s ease',
+                color: isActive ? "var(--green-text)" : "var(--text-muted)",
+                background: isActive ? "var(--green-tint)" : "transparent",
+                border: isActive
+                  ? "1px solid var(--green-tint-border)"
+                  : "1px solid transparent",
+                transition: "all 0.2s ease",
               }}
             >
-              <span style={{ fontSize: '16px' }}>{item.icon}</span>
+              <span style={{ fontSize: "16px" }}>{item.icon}</span>
               <span>{item.name}</span>
             </Link>
-          )
+          );
         })}
       </nav>
 
       {/* Footer Profile */}
       <div
         style={{
-          padding: '16px 20px',
-          borderTop: '1px solid var(--border)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
+          padding: "16px 20px",
+          borderTop: "1px solid var(--border)",
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
         }}
       >
         <div
           style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '50%',
-            background: 'var(--tag-bg)',
-            color: 'var(--text-muted)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            width: "32px",
+            height: "32px",
+            borderRadius: "50%",
+            background: "var(--tag-bg)",
+            color: "var(--text-muted)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             fontWeight: 700,
-            fontSize: '13px',
+            fontSize: "13px",
             flexShrink: 0,
           }}
         >
-          {(userEmail ?? '?').slice(0, 2).toUpperCase()}
+          {(userEmail ?? "?").slice(0, 2).toUpperCase()}
         </div>
-        <div style={{ flex: 1, overflow: 'hidden' }}>
-          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-            {userEmail ?? 'Not signed in'}
+        <div style={{ flex: 1, overflow: "hidden" }}>
+          <div
+            style={{
+              fontSize: "13px",
+              fontWeight: 600,
+              color: "var(--text)",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
+          >
+            {userEmail ?? "Not signed in"}
           </div>
           <button
             onClick={handleSignOut}
-            style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'none', padding: 0 }}
+            style={{
+              fontSize: "11px",
+              color: "var(--text-muted)",
+              background: "none",
+              padding: 0,
+            }}
           >
             Sign out
           </button>
         </div>
       </div>
     </aside>
-  )
+  );
 }
