@@ -75,7 +75,7 @@ against the wrong question.
 | WhatsApp send helpers | **Real.** `lib/whatsapp.ts` |
 | Conversation engine | **Real.** `lib/survey-engine.ts` |
 | Webhook endpoint | **Real**, signature-verified, idempotent (dedupes retried deliveries by WhatsApp message id — see `processed_messages`), and rate-limited per phone number (see `webhook_rate_limits`). `app/api/webhook/route.ts` |
-| Auth | **Real.** Supabase Auth (email/password), `middleware.ts` protects `/dashboard`, `/surveys`, `/settings`. |
+| Auth | **Real.** Supabase Auth — email/password, Google OAuth, and forgot-password — `middleware.ts` protects `/dashboard`, `/surveys`, `/settings`. |
 | Surveys API | **Real**, auth-scoped. `app/api/surveys/route.ts` (list/create) + `[id]/route.ts` (get/patch/delete). |
 | All 6 dashboard screens | **Real.** Server components pulling live Supabase data via `lib/queries.ts`. |
 
@@ -215,6 +215,22 @@ real values before expecting anything beyond the login page to work:
    id, access token, and app secret, and pick a `WHATSAPP_VERIFY_TOKEN`.
 4. Set `WHATSAPP_NUMBER` to the actual WhatsApp number (digits only)
    respondents will message — not the phone number id.
+5. **For Google sign-in to work**: Supabase Dashboard → Authentication
+   → Providers → Google → enable it, then paste in a Client ID and
+   Secret from a Google Cloud Console OAuth consent screen + credential
+   (Authorized redirect URI there is
+   `https://<project-ref>.supabase.co/auth/v1/callback` — the *Supabase*
+   callback, not this app's `/auth/callback`, which is a separate,
+   later hop). No env vars in this repo for it — the credentials live
+   only in Supabase's own config. Without this step the button is
+   there but every attempt fails.
+6. **For forgot-password and Google sign-in to redirect back correctly**:
+   Supabase Dashboard → Authentication → URL Configuration → add this
+   app's `/auth/callback` URL (both the deployed one and
+   `http://localhost:3000/auth/callback` for local dev) to Redirect
+   URLs, and set Site URL to the deployed URL. Without this, Supabase
+   silently refuses the redirect after a real recovery-link click or
+   Google auth, even though everything up to that point looked fine.
 
 **Deploying to Vercel:** import the repo at vercel.com — it auto-detects
 Next.js, no build settings to touch. Set every variable from
