@@ -94,6 +94,54 @@ as all-zero.
 
 ## Known traps
 
+0. **If the bot goes quiet (messages deliver on WhatsApp but nothing ever
+   replies), it is almost never the code.** This exact failure happened
+   and took a long time to track down. In order of likelihood, check:
+
+   a. **Meta → your app → WhatsApp → Configuration page → Webhook.**
+      The Callback URL and Verify token fields are **not** filled in by
+      default, even after you've generated an access token and grabbed
+      the Phone Number ID on the API Setup page — those are a separate
+      page from this one. If Callback URL / Verify token are blank (or
+      "Verify and save" was never clicked and confirmed), Meta has
+      nowhere to send events, full stop, regardless of anything else
+      being correct. Callback URL = `https://<your-domain>/api/webhook`,
+      Verify token = whatever you set `WHATSAPP_VERIFY_TOKEN` to.
+   b. **Same Configuration page, scroll down to "Webhook fields."**
+      Every field defaults to **Unsubscribed**, including `messages`.
+      A correctly-filled-in, verified Callback URL does *not* auto-subscribe
+      you to any event type. You must find the row literally labeled
+      `messages` and flip its toggle to Subscribed — that's the one that
+      carries inbound text/button/list replies. (The other `message_*`
+      rows — `message_echoes`, `message_template_*` — are for different
+      things; leave those alone.)
+   c. **The WABA-to-app subscription** (separate from b — this is an
+      API-level thing, not a dashboard toggle). Check via Meta's Graph
+      API Explorer: `GET /<WABA_ID>/subscribed_apps` with your access
+      token. An empty `"data": []` means the app was never subscribed to
+      that WhatsApp Business Account and nothing will ever arrive; `POST`
+      to the same path (no body) to subscribe. In practice this one was
+      already fine when checked, but it's cheap to rule out and has been
+      a documented, known Meta gotcha for other people's setups.
+   d. **`WHATSAPP_ACCESS_TOKEN` may have expired.** The token generated
+      from the API Setup page's "Generate access token" button is
+      **temporary — about 24 hours.** If the bot worked yesterday and
+      is silent today with no config changes, this is the first thing
+      to check. `lib/whatsapp.ts` logs a `WhatsApp send failed (HTTP ...)`
+      line with Meta's actual error body when a send fails (see Vercel
+      Logs, filtered to `/api/webhook`) — an expired token shows up
+      there clearly now instead of failing silently. Generate a
+      **permanent token** via a System User (Business Settings → System
+      Users) before this goes in front of real users; don't leave it on
+      the 24-hour one.
+   e. **Signature verification failing** — wrong `WHATSAPP_APP_SECRET`
+      on Vercel. Shows as `Webhook signature verification failed` in
+      Vercel Logs.
+
+   The webhook route and `lib/whatsapp.ts` both have real diagnostic
+   logging now (added after chasing this exact issue) — if the bot ever
+   goes quiet again, Vercel Logs should say *why*, not just nothing.
+
 1. **`WHATSAPP_NUMBER` and `WHATSAPP_PHONE_NUMBER_ID` are two different
    values from the Meta console — don't swap them.** The first is the
    public WhatsApp number and builds the `wa.me` links respondents
@@ -166,6 +214,18 @@ followed by `<span class="dot">.</span>`), `.btn` (`.btn-primary`,
 
 Prefer these over new inline styles.
 
+**Dark mode is real**, not just a design-token stub. Default is "auto"
+(`@media (prefers-color-scheme: dark)`); an explicit `data-theme="dark"`
+or `data-theme="light"` attribute on `<html>` overrides it.
+`components/ThemeToggle.tsx` is the toggle button (sun/moon icon,
+wired into `Topbar` and the login page) — it reads/writes
+`localStorage.theme` and flips the attribute. `app/layout.tsx` has a
+blocking inline script that applies the stored theme before first
+paint, so there's no flash of the wrong theme on load. When adding a
+new token to `globals.css`, check `tokens.json` in the brand kit for
+its dark value too — most tokens differ between themes (a few, like
+`--green` and `--near-black`, are intentionally identical in both).
+
 **One deliberate exception:** the phone simulator in
 `app/(dashboard)/surveys/new/page.tsx` hardcodes WhatsApp's own colours
 (`#0b141a`, `#202c33`, `#00a884`). That is correct — it is imitating
@@ -196,6 +256,38 @@ genuinely left, in rough priority order for taking this to real users:
    (arguably correct — changing questions under live respondents would
    corrupt the `current_question_index` invariant — but worth a
    deliberate decision rather than silent omission).
+
+## Account ownership (read this before touching infra)
+
+The project migrated off its original Supabase + Vercel accounts after
+the original Supabase project was accidentally deleted. Current state:
+
+- **Supabase** — new project, owned by the company email, not the
+  original personal account. Don't create another new project; this
+  one is the live one.
+- **Vercel** — likewise a fresh project under the company email. The
+  old personal-account Vercel project still exists but is no longer
+  deployed to — don't update env vars there, they do nothing now.
+- **Meta / WhatsApp Cloud API — still on the original personal Facebook
+  account.** This was never migrated. Two ways to fix that without
+  redoing the whole Cloud API setup (phone number, access token, app
+  secret, webhook subscription) from scratch:
+  - Add a second Admin to the app directly (App Dashboard → App Roles →
+    Add People) using their own Facebook login — quickest, no migration.
+  - Move the app into a Meta Business Manager (business.facebook.com)
+    so it's owned by a business entity instead of one person's account,
+    then add people as Business Manager Admins. More proper long-term,
+    more setup. Either way, the App ID, phone number, access token, and
+    webhook config stay exactly as they are — only *who can manage it*
+    changes.
+  - Whoever ends up owning this: the current access token is the
+    **temporary ~24-hour one** — see Known trap 0(d). Generate a
+    permanent System User token before this is relied on day to day.
+- **GitHub** — shared normally, more than one person already has push
+  access to this repo.
+
+A product requirements doc (`WhatsApp Survey Bot — PRD.docx`,
+`prd-dump.txt`) lives in the repo root.
 
 ## Running it
 
