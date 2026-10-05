@@ -1,0 +1,33 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "claude/add-readme",
+    "claude/auth-improvements",
+    "claude/combined-updates",
+    "claude/dark-mode",
+    "claude/update-claude-md",
+    "claude/whatsapp-send-logging",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "claude/add-readme": "main",
+    "claude/auth-improvements": "main",
+    "claude/combined-updates": "main",
+    "claude/dark-mode": "main",
+    "claude/update-claude-md": "main",
+    "claude/whatsapp-send-logging": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "claude/add-readme",
+    "claude/auth-improvements",
+    "claude/combined-updates",
+    "claude/dark-mode",
+    "claude/update-claude-md",
+    "claude/whatsapp-send-logging",
+    "origin"
+  ]
+}
