@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const PROTECTED_PREFIXES = ['/dashboard', '/surveys', '/settings']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } })
 
   const { pathname } = request.nextUrl
@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
     // than letting the exception 500 the entire site — a protected route
     // then cleanly redirects to /login instead of hitting a page that
     // will fail the exact same way.
-    console.error('middleware: auth check failed', error)
+    console.error('proxy: auth check failed', error)
   }
 
   if (!user && isProtected) {

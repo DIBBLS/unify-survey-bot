@@ -18,7 +18,7 @@ more often than a link to a web form.
 
 ## Stack
 
-- Next.js 14 (App Router), React 18, TypeScript
+- Next.js 16 (App Router), React 19, TypeScript
 - Supabase (Postgres + Auth) for storage and dashboard login
 - Meta WhatsApp Cloud API for messaging
 - Deploys to **Vercel** (zero-config for Next.js — no plugin or build settings needed)
@@ -318,7 +318,7 @@ npm install
 npm run dev          # http://localhost:3000
 ```
 
-Requires Node 18.17+. Copy `.env.example` to `.env.local` and fill in
+Requires Node 20.9+. Copy `.env.example` to `.env.local` and fill in
 real values before expecting anything beyond the login page to work:
 
 1. Create a Supabase project, paste `supabase/schema.sql` into its SQL
