@@ -119,7 +119,13 @@ export function validateAnswer(question: any, raw: string): Validation {
   const options = sortedOptions(question)
   const byId = options.find((o) => o.id === text)
   if (byId) return { status: 'valid', optionId: byId.id, text: null }
-  const byValue = options.find((o) => o.value === text)
+  // Label match is case-insensitive like yes/no: a respondent typing "blue"
+  // for "Blue" means it. Exact match first so distinct labels win.
+  const byValue =
+    options.find((o) => o.value === text) ??
+    options.find(
+      (o) => typeof o.value === 'string' && o.value.toLowerCase() === text.toLowerCase()
+    )
   if (byValue) return { status: 'valid', optionId: byValue.id, text: null }
   if (/^\d+$/.test(text)) {
     const n = parseInt(text, 10)
