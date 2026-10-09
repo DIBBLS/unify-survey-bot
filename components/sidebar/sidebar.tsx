@@ -9,7 +9,7 @@ import {
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -212,6 +212,7 @@ export function SidebarMenuButton({
   children,
   isActive,
   tooltip,
+  highlighted,
   onClick,
   onMouseEnter,
   onFocus,
@@ -220,12 +221,14 @@ export function SidebarMenuButton({
   children: ReactNode;
   isActive?: boolean;
   tooltip?: string;
+  highlighted?: boolean;
   onClick?: () => void;
   onMouseEnter?: () => void;
   onFocus?: () => void;
   className?: string;
 }) {
   const { open } = useSidebar();
+  const reduceMotion = useReducedMotion();
   const button = (
     <button
       onClick={onClick}
@@ -235,13 +238,30 @@ export function SidebarMenuButton({
       aria-label={!open && tooltip ? tooltip : undefined}
       className={cn(
         MENU_BUTTON,
+        'relative isolate',
         isActive
           ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
-          : 'font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+          : 'font-medium text-sidebar-foreground',
         !open && 'mx-auto h-10 w-10 justify-center p-0',
         className
       )}
     >
+      <AnimatePresence>
+        {highlighted && (
+          <motion.span
+            layoutId="sidebar-nav-highlight"
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 rounded-md bg-sidebar-accent"
+            initial={false}
+            exit={{ opacity: 0 }}
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { type: 'spring', stiffness: 550, damping: 45 }
+            }
+          />
+        )}
+      </AnimatePresence>
       {open && isActive && (
         <span aria-hidden="true" className="h-[6px] w-[6px] shrink-0 rounded-full bg-primary" />
       )}
