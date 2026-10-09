@@ -24,10 +24,18 @@ export interface ExportAnswer {
 }
 
 function escapeCell(value: string): string {
-  if (/[",\n\r]/.test(value)) {
-    return `"${value.replace(/"/g, '""')}"`
+  let out = value
+  // Formula injection: a cell starting with = + - @ executes in Excel when
+  // the creator opens the file, and the payload comes from respondents. A
+  // leading single quote forces text treatment (Excel/Sheets don't display
+  // it). Phone numbers are digits-only from Meta so this never touches them.
+  if (/^[=+\-@]/.test(out)) {
+    out = `'${out}`
   }
-  return value
+  if (/[",\n\r]/.test(out)) {
+    return `"${out.replace(/"/g, '""')}"`
+  }
+  return out
 }
 
 export function answerCell(
