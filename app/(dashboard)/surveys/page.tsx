@@ -9,8 +9,6 @@ import { Add01Icon, ClipboardIcon } from '@hugeicons/core-free-icons'
 
 const TABS = ['all', 'active', 'draft', 'closed'] as const
 
-const BTN_PRIMARY =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-6 py-3 font-sans text-sm font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
 const BTN_PRIMARY_SM =
   'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-3.5 py-1.5 font-sans text-[13px] font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
 const CARD =
@@ -39,10 +37,6 @@ export default async function SurveysPage({
           <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">Surveys</h1>
           <p className="mt-1 text-sm text-ink-muted">Create, deploy, and monitor your WhatsApp survey bots.</p>
         </div>
-        <Link href="/surveys/new" className={BTN_PRIMARY}>
-          <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.5} />
-          New WhatsApp Survey
-        </Link>
       </div>
 
       <div className="mb-6 flex gap-2 border-b border-border pb-3">
