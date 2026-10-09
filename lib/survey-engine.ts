@@ -336,21 +336,31 @@ export async function handleIncomingMessage(
     // so it is never saved as one.
     if (surveyId) {
       if (activeSession && activeSession.survey_id === surveyId) {
+        if (!activeSession.surveys || activeSession.surveys.status !== 'active') {
+          // Link re-tapped after the survey closed: same closed handling as
+          // the main flow below — never keep serving a closed survey.
+          await abandonSession(supabase, activeSession.id)
+          await sendTextMessage(phoneNumber, 'This survey is now closed. Thanks for your interest!')
+          return
+        }
         // Same survey tapped again: nudge with the current question.
         const questions = sortedQuestions(activeSession.surveys)
         const idx = activeSession.current_question_index
         if (idx >= 1 && idx <= questions.length) {
           await sendTextMessage(phoneNumber, "You're already on this survey — here's where you left off.")
           await sendQuestion(phoneNumber, questions[idx - 1], idx, questions.length)
+          return
         }
+        // Pointer out of range: fall through to the defensive completion
+        // branch below instead of going silent.
+      } else {
+        if (activeSession) {
+          // Switching surveys abandons the previous attempt (kept as Abandoned).
+          await abandonSession(supabase, activeSession.id)
+        }
+        await startSurvey(phoneNumber, surveyId)
         return
       }
-      if (activeSession) {
-        // Switching surveys abandons the previous attempt (kept as Abandoned).
-        await abandonSession(supabase, activeSession.id)
-      }
-      await startSurvey(phoneNumber, surveyId)
-      return
     }
 
     if (!activeSession) {
