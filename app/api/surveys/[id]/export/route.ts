@@ -25,16 +25,25 @@ export async function GET(
     return NextResponse.json({ error: 'Survey not found' }, { status: 404 })
   }
 
-  const { data: responses } = await supabase
+  const { data: responses, error: responsesError } = await supabase
     .from('responses')
     .select('id, phone_number, completed, created_at')
     .eq('survey_id', params.id)
     .order('created_at', { ascending: true })
 
+  // Never serve a silent partial export: a failed query must 500 rather
+  // than download an empty-looking CSV the creator would trust.
+  if (responsesError) {
+    return NextResponse.json({ error: 'Failed to load responses' }, { status: 500 })
+  }
+
   const responseIds = (responses ?? []).map((r: any) => r.id)
-  const { data: answers } = responseIds.length
+  const { data: answers, error: answersError } = responseIds.length
     ? await supabase.from('answers').select('*').in('response_id', responseIds)
-    : { data: [] as any[] }
+    : { data: [] as any[], error: null }
+  if (answersError) {
+    return NextResponse.json({ error: 'Failed to load answers' }, { status: 500 })
+  }
 
   const questions = ((survey as any).questions ?? []).map((q: any) => ({
     id: q.id,
@@ -46,7 +55,12 @@ export async function GET(
 
   const csv = buildSurveyCsv(questions, (responses ?? []) as any[], (answers ?? []) as any[])
 
-  return new NextResponse(csv, {
+  // Full phone numbers by decision: the dashboard masks, but the export is
+  // the creator's own data and needs real numbers (contact, dedupe). This
+  // resolves the PRD's identified-vs-anonymous open question toward
+  // identified for exports — revisit if policy changes.
+  // BOM first: without it Excel mojibakes non-ASCII respondent text.
+  return new NextResponse('\uFEFF' + csv, {
     status: 200,
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
