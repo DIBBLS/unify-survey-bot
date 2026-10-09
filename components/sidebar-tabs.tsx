@@ -108,9 +108,9 @@ function UserMenu({ userEmail }: { userEmail: string | null }) {
       <SidebarMenuItem>
         <DropdownMenuPrimitive.Root>
           <DropdownMenuPrimitive.Trigger asChild>
-            <SidebarMenuButton className="h-12">
+            <SidebarMenuButton className={open ? 'h-12' : 'h-10'}>
               <AvatarPrimitive.Root
-                className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sidebar-accent ${open ? 'h-8 w-8' : 'h-10 w-10'}`}
+                className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sidebar-accent"
               >
                 <AvatarPrimitive.Fallback className="text-xs font-bold text-sidebar-accent-foreground">
                   {initials}
@@ -220,9 +220,9 @@ function Shell({
     <div className="flex w-full overflow-hidden bg-sidebar" style={{ height: '100dvh' }}>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-3 px-4 py-3">
+          <div className={`flex items-center gap-3 py-3 ${open ? 'px-4' : 'justify-center px-0'}`}>
             <span
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-sidebar-primary font-display text-[19px] font-black leading-none text-sidebar-primary-foreground"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-sidebar-primary font-display text-[19px] font-black leading-none text-sidebar-primary-foreground"
               aria-hidden="true"
             >
               U
