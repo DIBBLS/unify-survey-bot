@@ -35,7 +35,7 @@ const BTN_GHOST_SM =
   'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-[13px] font-semibold text-ink-muted transition-all duration-150 hover:bg-surface-2 hover:text-ink'
 const CARD = 'rounded-lg border border-border bg-surface p-6 shadow-card'
 const INPUT =
-  'w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50'
+  'w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
 const LABEL = 'text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted'
 
 export default function NewSurveyPage() {

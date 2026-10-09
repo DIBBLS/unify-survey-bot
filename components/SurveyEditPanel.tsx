@@ -88,7 +88,7 @@ export default function SurveyEditPanel({
           <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Survey Title</label>
           <input
             type="text"
-            className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={saving}
@@ -98,7 +98,7 @@ export default function SurveyEditPanel({
         <div className="flex flex-col gap-1.5">
           <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Description / Greeting Message</label>
           <textarea
-            className="min-h-[100px] w-full resize-y rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-[100px] w-full resize-y rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={saving}
