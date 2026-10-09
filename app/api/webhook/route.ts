@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { extractMessageText, extractPhoneNumber, extractMessageId } from '@/lib/whatsapp'
+import { extractMessageText, extractPhoneNumber, extractMessageId, extractMessageKind } from '@/lib/whatsapp'
 import { handleIncomingMessage } from '@/lib/survey-engine'
 
 function isValidSignature(rawBody: string, signatureHeader: string | null): boolean {
@@ -52,18 +52,19 @@ export async function POST(req: NextRequest) {
     const phoneNumber = extractPhoneNumber(body)
     const messageText = extractMessageText(body)
     const messageId = extractMessageId(body)
+    const kind = extractMessageKind(body)
 
-    if (phoneNumber && messageText) {
-      console.log(`📩 Incoming message from ${phoneNumber}: "${messageText}"`)
+    if (phoneNumber && (messageText || kind === 'media')) {
+      console.log(`Incoming message from ${phoneNumber}: "${messageText ?? `<${kind}>`}"`)
 
       // Check if message text starts with START_SURVEY_ID pattern
       let surveyId: string | undefined
-      if (messageText.startsWith('START_')) {
+      if (messageText && messageText.startsWith('START_')) {
         surveyId = messageText.replace('START_', '')
       }
 
       // Process message through Survey Engine
-      await handleIncomingMessage(phoneNumber, messageText, surveyId, messageId)
+      await handleIncomingMessage(phoneNumber, messageText, surveyId, messageId, kind)
     } else {
       // Meta also posts delivery/read receipts and other non-message
       // events to this same webhook — this is expected for those. If

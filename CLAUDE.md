@@ -67,6 +67,28 @@ question to send**, not the last one answered.
 Preserve that invariant. Off-by-one here silently misfiles every answer
 against the wrong question.
 
+Further engine invariants (bot-correctness work, council-decided — don't
+weaken without a new decision):
+
+- **Invalid input never advances and is never saved.** `validateAnswer`
+  in `survey-engine.ts` checks each reply against its question type and
+  re-sends the same question on failure. Yes/no accepts a frozen set only
+  (`yes/no/y/n`, trimmed, case-insensitive); rating accepts `1`–`5`;
+  choice accepts exact option id/value or a 1-based number. No slang.
+- **Commands are exact full-message matches** (case-insensitive):
+  `STOP` sets `sessions.opted_out_at` and the number stays quiet until
+  `RESTART` or a fresh `START_` tap; `RESTART` abandons the live session
+  (kept as Abandoned) and starts Q1 over — immediate, no confirm step.
+- **`START_<id>` is routing, never an answer.** Same-survey tap re-sends
+  the current question; different-survey tap abandons and switches.
+- **One response per number per survey:** a completed `responses` row
+  blocks a second session with a "already recorded" reply.
+- **Media gets a "reply with text" prompt**, never silence; receipts stay
+  silent. Engine exceptions send a friendly in-chat message and still ack
+  200 so Meta doesn't retry into the dedupe wall.
+- `>10` options render as a numbered text list (list messages cap at 10
+  rows); replies map 1..N in `created_at` order, same order as rendering.
+
 ## Current state — read this carefully
 
 | Area | State |

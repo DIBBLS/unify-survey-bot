@@ -38,7 +38,10 @@ create table public.sessions (
   survey_id uuid references public.surveys(id) on delete cascade not null,
   current_question_index integer not null default 1,
   started_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  completed_at timestamp with time zone
+  completed_at timestamp with time zone,
+  -- Set when the respondent replies STOP: the number stays quiet until it
+  -- sends RESTART or taps a fresh START_ link. NULL = engaged.
+  opted_out_at timestamp with time zone
 );
 
 -- 5. Responses Table (Individual submission header)
@@ -161,3 +164,11 @@ create policy "Owners view answers on their responses" on public.answers
       where responses.id = answers.response_id and surveys.user_id = auth.uid()
     )
   );
+
+-- ─── Additive migrations for existing projects ─────────────────────────
+-- (Fresh installs get these from the CREATE TABLEs above. Do NOT re-paste
+-- the full file over an existing project — apply just the new statements.)
+
+-- Bot correctness work: respondent opt-out state on sessions.
+alter table public.sessions
+  add column if not exists opted_out_at timestamp with time zone;

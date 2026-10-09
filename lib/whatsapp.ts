@@ -70,6 +70,8 @@ export async function sendListMessage(
   })
 }
 
+export type InboundKind = 'text' | 'media' | 'unknown'
+
 export function extractMessageText(body: any): string | null {
   try {
     const msg = body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]
@@ -101,5 +103,34 @@ export function extractMessageId(body: any): string | null {
     return body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]?.id ?? null
   } catch {
     return null
+  }
+}
+
+// What kind of inbound payload this is. 'text' covers plain text plus
+// interactive replies that resolve to an answer id; 'media' covers
+// image/audio/video/document/sticker/location/contacts (things the engine
+// must answer with a "reply with text" prompt, not silence); 'unknown' is
+// delivery receipts and anything else — ignored, only logged.
+export function extractMessageKind(body: any): InboundKind {
+  try {
+    const msg = body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]
+    if (!msg || typeof msg.type !== 'string') return 'unknown'
+    if (msg.type === 'text') return 'text'
+    if (msg.type === 'interactive') {
+      if (msg.interactive?.button_reply?.id || msg.interactive?.list_reply?.id) {
+        return 'text'
+      }
+      return 'unknown'
+    }
+    if (
+      ['image', 'audio', 'video', 'document', 'sticker', 'location', 'contacts'].includes(
+        msg.type
+      )
+    ) {
+      return 'media'
+    }
+    return 'unknown'
+  } catch {
+    return 'unknown'
   }
 }
