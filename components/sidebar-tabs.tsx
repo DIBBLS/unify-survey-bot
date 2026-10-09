@@ -7,6 +7,7 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import * as AvatarPrimitive from '@radix-ui/react-avatar';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
   ClipboardIcon,
@@ -91,6 +92,7 @@ function crumbsFor(pathname: string | null): Array<{ label: string; href?: strin
 
 function UserMenu({ userEmail }: { userEmail: string | null }) {
   const router = useRouter();
+  const { open } = useSidebar();
   const initials = (userEmail ?? '?').slice(0, 2).toUpperCase();
 
   const signOut = async () => {
@@ -112,14 +114,16 @@ function UserMenu({ userEmail }: { userEmail: string | null }) {
                   {initials}
                 </AvatarPrimitive.Fallback>
               </AvatarPrimitive.Root>
-              <span className="grid min-w-0 flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold text-sidebar-accent-foreground">
-                  {userEmail ?? 'Not signed in'}
+              {open && (
+                <span className="grid min-w-0 flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold text-sidebar-accent-foreground">
+                    {userEmail ?? 'Not signed in'}
+                  </span>
+                  <span className="truncate text-xs text-sidebar-foreground">
+                    Workspace
+                  </span>
                 </span>
-                <span className="truncate text-xs text-sidebar-foreground">
-                  Workspace
-                </span>
-              </span>
+              )}
             </SidebarMenuButton>
           </DropdownMenuPrimitive.Trigger>
           <DropdownMenuPrimitive.Portal>
@@ -337,7 +341,16 @@ function Shell({
                 ))}
             </Breadcrumb>
           </div>
-          <div className="ml-auto flex items-center">
+          <div className="ml-auto flex items-center gap-2">
+            {pathname !== '/surveys/new' && (
+              <Link
+                href="/surveys/new"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-3.5 py-1.5 font-sans text-[13px] font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82]"
+              >
+                <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.5} />
+                <span className="hidden sm:inline">Create Survey</span>
+              </Link>
+            )}
             <ThemeToggle />
           </div>
         </header>
