@@ -161,7 +161,15 @@
 /* ─── Reset ─────────────────────────────────────────────────────── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { font-size: 16px; scroll-behavior: smooth; }
+html { font-size: 16px; }
+
+/* ─── Lenis smooth scroll ──────────────────────────────────────────
+   Lenis drives smoothing via rAF — native CSS smooth scrolling
+   conflicts with it, so it stays off. */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
 
 body {
   font-family: var(--font-sans);
@@ -959,126 +967,35 @@ h4, .h4 {
   position: relative;
   min-width: 0;
 }
-.chrome-tabrow {
+.chrome-mobilebar {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   background: var(--surface);
-  padding-top: 8px;
+  padding: 8px 0 8px 8px;
 }
-.chrome-mobilemenu { display: flex; flex-shrink: 0; align-self: center; margin-left: 8px; }
 @media (min-width: 768px) {
-  .chrome-mobilemenu { display: none; }
+  .chrome-mobilebar { display: none; }
 }
-.chrome-tabrow-scroll {
-  display: flex;
-  align-items: flex-end;
-  overflow-x: auto;
+.chrome-main-scroll {
   flex: 1;
-  min-width: 0;
-}
-.chrome-tablist {
-  display: flex;
-  align-items: flex-end;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.chrome-tab-lift { position: relative; flex-shrink: 0; }
-.chrome-tab {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  user-select: none;
-  min-width: 140px;
-  max-width: 220px;
-  color: var(--text-muted);
-  outline: none;
-  transition: color 150ms ease-out;
-}
-.chrome-tab:hover { color: var(--text); }
-.chrome-tab.is-active { color: var(--text); }
-.chrome-tab-bg {
-  position: absolute;
-  inset: 0;
-  background: var(--bg);
-  border-radius: 12px 12px 0 0;
-}
-.chrome-tab-curve {
-  position: absolute;
-  bottom: 0;
-  width: 12px;
-  height: 12px;
   overflow: hidden;
-}
-.chrome-tab-curve.left { left: -12px; }
-.chrome-tab-curve.right { right: -12px; }
-.chrome-tab-curve-dot {
-  position: absolute;
-  bottom: 0;
-  width: 24px;
-  height: 24px;
   background: var(--surface);
-  border-radius: 50%;
+  padding: 0;
+  min-height: 0;
 }
-.chrome-tab-curve.left .chrome-tab-curve-dot { right: 0; }
-.chrome-tab-curve.right .chrome-tab-curve-dot { left: 0; }
-.chrome-tab-curve-fill {
-  position: absolute;
-  inset: 0;
+@media (min-width: 768px) {
+  .chrome-main-scroll { padding: 0 12px 12px 0; }
+  .chrome-card {
+    border-radius: 24px;
+  }
+}
+.chrome-card {
+  height: 100%;
   background: var(--bg);
+  overflow: auto;
 }
-.chrome-tab-inner {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-}
-.chrome-tab-label {
-  flex: 1;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  user-select: none;
-}
-.chrome-tab-close {
-  display: flex;
-  width: 20px;
-  height: 20px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: var(--text-muted);
-  flex-shrink: 0;
-  transition: background-color 150ms ease-out, color 150ms ease-out, opacity 150ms ease-out;
-}
-.chrome-tab-close.hover-only { opacity: 0; }
-.chrome-tab:hover .chrome-tab-close.hover-only,
-.chrome-tab:focus-within .chrome-tab-close.hover-only { opacity: 1; }
-.chrome-tab-close:hover { background: var(--tag-bg); color: var(--text); }
-.chrome-tab-divider {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1px;
-  height: 16px;
-  background: var(--border);
-}
-.chrome-newtab { flex-shrink: 0; }
-.chrome-tabrow-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 8px 3px 4px;
-  flex-shrink: 0;
-}
+.chrome-card-inner { min-height: 100%; }
+
 .chrome-icon-btn {
   display: flex;
   width: 36px;
@@ -1091,62 +1008,6 @@ h4, .h4 {
   transition: background-color 150ms ease-out, color 150ms ease-out;
 }
 .chrome-icon-btn:hover { color: var(--text); background: var(--surface-2); }
-.new-tab-btn { margin-left: 4px; margin-bottom: 2px; width: 36px; height: 36px; }
-
-.chrome-main-scroll {
-  flex: 1;
-  overflow: hidden;
-  background: var(--surface);
-  padding: 0;
-  min-height: 0;
-}
-@media (min-width: 768px) {
-  .chrome-main-scroll { padding: 0 12px 12px 0; }
-  .chrome-card {
-    border-radius: 0 24px 24px 24px;
-  }
-  .chrome-card.with-tl {
-    border-radius: 24px;
-  }
-}
-.chrome-card {
-  height: 100%;
-  background: var(--bg);
-  overflow: auto;
-}
-.chrome-card-inner { min-height: 100%; }
-
-.chrome-menu {
-  min-width: 192px;
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  padding: 4px;
-  color: var(--text);
-  box-shadow: var(--shadow-card);
-  z-index: 50;
-}
-.chrome-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: var(--radius-sm);
-  padding: 6px 8px;
-  font-size: 14px;
-  outline: none;
-  cursor: default;
-  user-select: none;
-  color: var(--text);
-}
-.chrome-menu-item[data-highlighted] { background: var(--surface-2); }
-.chrome-menu-item[data-disabled] { opacity: 0.5; pointer-events: none; }
-.chrome-menu-item.is-danger { color: var(--red-text); }
-.chrome-menu-separator {
-  height: 1px;
-  background: var(--border);
-  margin: 4px -4px;
-}
 .chrome-tooltip {
   z-index: 50;
   overflow: hidden;
@@ -1159,33 +1020,6 @@ h4, .h4 {
   color: var(--text);
   box-shadow: var(--shadow-card);
 }
-.chrome-hovercard {
-  width: 192px;
-  padding: 4px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-  z-index: 50;
-}
-.chrome-hovercard-title {
-  font-size: 12px;
-  color: var(--text-muted);
-  padding: 6px 8px;
-  font-weight: 500;
-}
-.chrome-hovercard-item {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  font-size: 14px;
-  color: var(--text);
-  border-radius: var(--radius-md);
-  transition: background-color 150ms ease-out;
-}
-.chrome-hovercard-item:hover { background: var(--surface-2); }
 .chrome-sheet-overlay {
   position: fixed;
   inset: 0;

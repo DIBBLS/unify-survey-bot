@@ -6,7 +6,6 @@ import { formatDuration, whatsAppLink } from '@/lib/format'
 import CopyButton from '@/components/CopyButton'
 import PrintButton from '@/components/PrintButton'
 import SurveyEditPanel from '@/components/SurveyEditPanel'
-import { SurveyTabTitle } from '@/components/sidebar-tabs'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Link01Icon, Tick01Icon } from '@hugeicons/core-free-icons'
 
@@ -24,7 +23,6 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
 
   return (
     <div className="animate-fade-up">
-      <SurveyTabTitle title={survey.title} />
       <div className="page-header">
         <div>
           <Link href="/surveys" style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'inline-block', marginBottom: '4px' }}>
