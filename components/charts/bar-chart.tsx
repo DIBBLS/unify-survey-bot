@@ -312,17 +312,20 @@ function BarChart({
       data-slot="bar-chart"
       data-orientation={orientation}
       className={cn(
-        'bc-root',
-        !vertical && showXAxis && ticks.length > 0 && 'has-row-axis',
+        'w-full select-none',
+        !vertical && showXAxis && ticks.length > 0 && 'grid grid-cols-[auto_1fr] gap-x-3',
         className
       )}
       style={{ '--bar-chart-color': color, ...style } as CSSProperties}
       {...props}
     >
       {!vertical && ticks.length > 0 ? (
-        <div aria-hidden="true" data-slot="bar-chart-axis" className="bc-axis">
+        <div aria-hidden="true" data-slot="bar-chart-axis" className="flex flex-col">
           {bars.map((_, at) => (
-            <span key={at} className="bc-axis-label">
+            <span
+              key={at}
+              className="flex flex-1 items-center justify-end whitespace-nowrap text-xs text-ink-muted"
+            >
               {labels?.[at]}
             </span>
           ))}
@@ -342,7 +345,10 @@ function BarChart({
         data-slot="bar-chart-plot"
         data-state={entrance}
         data-engaged={engaged ? '' : undefined}
-        className={cn('bc-plot', vertical ? 'is-vertical' : 'is-horizontal')}
+        className={cn(
+          'relative w-full rounded-md outline-none [container-type:inline-size] focus-visible:shadow-[0_0_0_3px_var(--green-tint)]',
+          vertical ? 'aspect-[3/1] touch-pan-y' : 'touch-pan-x'
+        )}
         style={vertical ? undefined : { height: ROW * bars.length }}
         onPointerMove={onPointer}
         onPointerDown={onPointer}
@@ -355,7 +361,7 @@ function BarChart({
           aria-hidden="true"
           viewBox={`0 0 ${n(width)} ${n(height)}`}
           preserveAspectRatio="none"
-          className="bc-svg"
+          className="absolute inset-0 size-full overflow-visible"
         >
           {bars.map((item, at) => (
             <path
@@ -366,7 +372,7 @@ function BarChart({
               data-negative={item.negative ? '' : undefined}
               d={item.d}
               fill="var(--bar-chart-color)"
-              className="bc-bar"
+              className="transition-opacity data-[dimmed]:opacity-40 motion-reduce:!transition-none motion-reduce:![transform:none]"
               style={{
                 transformBox: 'view-box',
                 transformOrigin: vertical
@@ -403,7 +409,10 @@ function BarChart({
                 key={at}
                 aria-hidden="true"
                 data-slot="bar-chart-value"
-                className={cn('bc-value', entrance === 'armed' && 'is-armed')}
+                className={cn(
+                  'pointer-events-none absolute font-mono text-[11px] leading-none whitespace-nowrap tabular-nums transition-opacity motion-reduce:!transition-none motion-reduce:!opacity-100',
+                  entrance === 'armed' && 'opacity-0'
+                )}
                 style={{
                   left: `${((vertical ? item.center : item.tip) / width) * 100}%`,
                   top: `${((vertical ? item.tip : item.center) / height) * 100}%`,
@@ -423,30 +432,35 @@ function BarChart({
         <div
           aria-hidden="true"
           data-slot="bar-chart-tooltip-anchor"
-          className="bc-tip-anchor"
+          className="pointer-events-none absolute top-0 left-0 z-10 size-0 motion-reduce:!transition-none"
           style={{ transform: `translate3d(${anchor}, 0)`, transition: glide }}
         >
           <div
             data-slot="bar-chart-tooltip"
             data-state={engaged ? 'open' : 'closed'}
-            className={cn('bc-tip', flip ? 'to-right' : 'to-left')}
+            className={cn(
+              'absolute top-0 grid w-max min-w-32 -translate-y-1/2 gap-1.5 rounded-md border border-border bg-surface px-2.5 py-1.5 text-xs text-ink shadow-card transition-opacity data-[state=closed]:opacity-0 motion-reduce:transition-none',
+              flip ? 'right-2' : 'left-2'
+            )}
           >
-            {label ? <div className="bc-tip-label">{label}</div> : null}
-            <div className="bc-tip-row">
-              <span className="bc-tip-swatch" />
-              {name ? <span className="bc-tip-name">{name}</span> : null}
-              <span className="bc-tip-value">{format(bar.value, index)}</span>
+            {label ? <div className="font-medium">{label}</div> : null}
+            <div className="flex items-center gap-2">
+              <span className="size-2.5 shrink-0 rounded-[3px] bg-[color:var(--bar-chart-color)]" />
+              {name ? <span className="text-ink-muted">{name}</span> : null}
+              <span className="ml-auto font-mono font-medium tabular-nums">
+                {format(bar.value, index)}
+              </span>
             </div>
           </div>
         </div>
       </div>
 
       {vertical && ticks.length > 0 ? (
-        <div aria-hidden="true" data-slot="bar-chart-axis" className="bc-xaxis">
+        <div aria-hidden="true" data-slot="bar-chart-axis" className="relative mt-2 h-5">
           {ticks.map((tick) => (
             <span
               key={tick}
-              className="bc-tick"
+              className="absolute top-0 -translate-x-1/2 whitespace-nowrap text-[11px] leading-none tabular-nums text-ink-muted"
               style={{ left: `${(bars[tick]!.center / width) * 100}%` }}
             >
               {labels?.[tick]}

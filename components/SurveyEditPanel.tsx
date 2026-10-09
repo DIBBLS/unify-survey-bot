@@ -3,7 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { PencilEdit02Icon } from '@hugeicons/core-free-icons'
+import { PencilEdit02Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
+
+const BTN = 'inline-flex items-center gap-2 whitespace-nowrap rounded-md font-sans font-semibold transition-all duration-150'
+const BTN_SM = 'px-3.5 py-1.5 text-[13px]'
 
 export default function SurveyEditPanel({
   surveyId,
@@ -63,66 +66,71 @@ export default function SurveyEditPanel({
   if (!editing) {
     return (
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <h1 className="page-title">{initialTitle}</h1>
-          <span className={`badge badge-${initialStatus === 'active' ? 'active' : initialStatus === 'closed' ? 'closed' : 'draft'}`}>
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">{initialTitle}</h1>
+          <span className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold tracking-[0.02em] before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:content-[""] ${initialStatus === 'active' ? 'bg-accent-tint text-accent-fg before:bg-accent-deep before:animate-pulse-dot' : initialStatus === 'closed' ? 'bg-danger-tint text-danger-fg before:bg-danger' : 'bg-tag text-ink-muted before:bg-ink-muted'}`}>
             {initialStatus === 'active' ? 'Live Bot' : initialStatus}
           </span>
-          <button onClick={startEdit} className="btn btn-ghost btn-sm">
+          <button onClick={startEdit} className={`${BTN} ${BTN_SM} bg-transparent px-3 py-2 text-ink-muted hover:bg-surface-2 hover:text-ink`}>
             <HugeiconsIcon icon={PencilEdit02Icon} size={14} strokeWidth={2} />
             Edit
           </button>
         </div>
-        <p className="page-subtitle">{initialDescription || 'No description'}</p>
+        <p className="mt-1 text-sm text-ink-muted">{initialDescription || 'No description'}</p>
       </div>
     )
   }
 
   return (
-    <div className="glass-card" style={{ padding: '20px', maxWidth: '480px', marginTop: '4px' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div className="form-group">
-          <label className="form-label">Survey Title</label>
+    <div className="mt-1 max-w-[480px] rounded-lg border border-border bg-surface p-5 shadow-card">
+      <div className="flex flex-col gap-3.5">
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Survey Title</label>
           <input
             type="text"
-            className="form-input"
+            className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={saving}
           />
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Description / Greeting Message</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Description / Greeting Message</label>
           <textarea
-            className="form-input form-textarea"
+            className="min-h-[100px] w-full resize-y rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={saving}
           />
         </div>
 
-        <div className="form-group">
-          <label className="form-label">Status</label>
-          <select
-            className="form-select"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            disabled={saving}
-          >
-            <option value="draft">Draft</option>
-            <option value="active">Active — Live Bot</option>
-            <option value="closed">Closed</option>
-          </select>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Status</label>
+          <div className="relative">
+            <select
+              className="w-full appearance-none rounded-md border border-border-strong bg-surface-2 px-4 py-3 pr-10 font-sans text-sm text-ink outline-none transition-all focus:border-ink disabled:cursor-not-allowed disabled:opacity-50"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              disabled={saving}
+            >
+              <option value="draft">Draft</option>
+              <option value="active">Active — Live Bot</option>
+              <option value="closed">Closed</option>
+            </select>
+            <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 flex -translate-y-1/2 text-ink-muted">
+              <HugeiconsIcon icon={ArrowDown01Icon} size={14} strokeWidth={2} />
+            </span>
+          </div>
         </div>
 
-        {error && <div style={{ fontSize: '13px', color: 'var(--red-text)' }}>{error}</div>}
+        {error && <div className="text-[13px] text-danger-fg">{error}</div>}
 
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={save} className="btn btn-primary btn-sm" disabled={saving}>
+        <div className="flex gap-2">
+          <button onClick={save} className={`${BTN} ${BTN_SM} bg-ink text-canvas hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50`} disabled={saving}>
             {saving ? 'Saving…' : 'Save Changes'}
           </button>
-          <button onClick={() => setEditing(false)} className="btn btn-secondary btn-sm" disabled={saving}>
+          <button onClick={() => setEditing(false)} className={`${BTN} ${BTN_SM} border border-border-strong bg-surface text-ink hover:bg-surface-2`} disabled={saving}>
             Cancel
           </button>
         </div>

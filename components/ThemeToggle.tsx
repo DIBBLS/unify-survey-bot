@@ -42,13 +42,13 @@ export default function ThemeToggle() {
   // Avoid a hydration mismatch: render nothing meaningful until the client
   // has read localStorage/system preference.
   if (!mounted) {
-    return <button className="btn btn-ghost btn-sm" aria-label="Toggle theme" style={{ width: '32px' }} />
+    return <button className="inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3.5 py-1.5 font-sans text-[13px] font-semibold text-ink-muted" aria-label="Toggle theme" style={{ width: '32px' }} />
   }
 
   return (
     <button
       onClick={toggle}
-      className="btn btn-ghost btn-sm"
+      className="inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-sm font-semibold text-ink-muted transition-all duration-150 hover:bg-surface-2 hover:text-ink"
       aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
       title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
     >

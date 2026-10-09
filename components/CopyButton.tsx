@@ -18,7 +18,7 @@ export default function CopyButton({
       Copied
     </>
   ),
-  className = 'btn btn-secondary btn-sm',
+  className = 'inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-border-strong bg-surface px-3.5 py-1.5 font-sans text-[13px] font-semibold text-ink transition-all duration-150 hover:bg-surface-2',
   style,
 }: {
   text: string
