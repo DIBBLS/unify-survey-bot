@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase-server'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Add01Icon, ZapIcon, ClipboardIcon } from '@hugeicons/core-free-icons'
 import {
   getSurveysWithStats,
   getAvgCompletionSeconds,
@@ -9,6 +11,7 @@ import {
 } from '@/lib/queries'
 import { formatDuration, whatsAppLink } from '@/lib/format'
 import CopyButton from '@/components/CopyButton'
+import { BarChart } from '@/components/charts/bar-chart'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -31,37 +34,39 @@ export default async function DashboardPage() {
   const avgCompletionRate = totalAttempts > 0 ? Math.round((totalResponses / totalAttempts) * 100) : 0
   const activeSurveys = surveys.filter((s) => s.status === 'active').length
   const responsesThisWeek = activity.reduce((sum, a) => sum + a.count, 0)
-  const maxActivity = Math.max(1, ...activity.map((a) => a.count))
 
   return (
     <div className="animate-fade-up">
-      <div className="hero-banner">
+      <div className="page-header">
         <div>
-          <div className="eyebrow hero-eyebrow">Workspace Overview</div>
-          <h1>Every response, straight from WhatsApp.</h1>
-          <p>Real-time survey performance and respondent engagement, no web form required.</p>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">
+            {responsesThisWeek} {responsesThisWeek === 1 ? 'response' : 'responses'} in the last
+            7 days across {surveys.length} survey{surveys.length === 1 ? '' : 's'}.
+          </p>
         </div>
-        <Link href="/surveys/new" className="btn btn-hero">
-          ➕ Create Survey
+        <Link href="/surveys/new" className="btn btn-primary">
+          <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.5} />
+          Create Survey
         </Link>
       </div>
 
-      <div className="stats-grid">
-        <div className="glass-card stat-card">
+      <div className="glass-card stat-strip">
+        <div className="stat-cell">
           <div className="stat-label">Completed Responses</div>
           <div className="stat-value">{totalResponses}</div>
           <div className="stat-change positive">{responsesThisWeek} in the last 7 days</div>
         </div>
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Avg. Completion Rate</div>
+        <div className="stat-cell">
+          <div className="stat-label">Completion Rate</div>
           <div className="stat-value">{avgCompletionRate}%</div>
           <div className="stat-change">
-            Across {surveys.length} survey{surveys.length === 1 ? '' : 's'}
+            {totalAttempts} attempt{totalAttempts === 1 ? '' : 's'} total
           </div>
         </div>
 
-        <div className="glass-card stat-card">
+        <div className="stat-cell">
           <div className="stat-label">Active Surveys</div>
           <div className="stat-value">{activeSurveys}</div>
           <div className="stat-change">
@@ -69,23 +74,19 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="glass-card stat-card">
+        <div className="stat-cell">
           <div className="stat-label">Avg. Completion Time</div>
           <div className="stat-value">{avgSeconds !== null ? formatDuration(avgSeconds) : '—'}</div>
           <div className="stat-change">
-            ⚡ Instant WhatsApp responses
+            <span style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '4px' }}>
+              <HugeiconsIcon icon={ZapIcon} size={13} strokeWidth={2} />
+            </span>
+            Instant WhatsApp responses
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '2fr 1fr',
-          gap: '24px',
-          marginBottom: '28px',
-        }}
-      >
+      <div className="dash-grid">
         <div className="glass-card" style={{ padding: '24px' }}>
           <div
             style={{
@@ -104,23 +105,12 @@ export default async function DashboardPage() {
             <span className="badge badge-active">Live Engine</span>
           </div>
 
-          <div style={{ height: '200px', display: 'flex', alignItems: 'flex-end', gap: '16px', paddingTop: '20px' }}>
-            {activity.map((bar, i) => (
-              <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', height: '100%', justifyContent: 'flex-end' }}>
-                <div style={{ fontSize: '11px', color: 'var(--green-text)', fontWeight: 600 }}>{bar.count}</div>
-                <div
-                  style={{
-                    width: '100%',
-                    maxWidth: '40px',
-                    height: `${Math.max((bar.count / maxActivity) * 100, 4)}%`,
-                    background: 'linear-gradient(180deg, var(--green) 0%, rgba(74,222,128,0.12) 100%)',
-                    borderRadius: '6px 6px 0 0',
-                  }}
-                />
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{bar.day}</div>
-              </div>
-            ))}
-          </div>
+          <BarChart
+            name="Responses"
+            data={activity.map((a) => a.count)}
+            labels={activity.map((a) => a.day)}
+            showValues
+          />
         </div>
 
         <div className="glass-card" style={{ padding: '24px' }}>
@@ -175,13 +165,16 @@ export default async function DashboardPage() {
 
         {surveys.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-state-icon">📋</div>
+            <div className="empty-state-icon" style={{ display: 'flex', justifyContent: 'center' }}>
+              <HugeiconsIcon icon={ClipboardIcon} size={40} strokeWidth={1.5} />
+            </div>
             <div className="empty-state-title">No surveys yet</div>
             <div className="empty-state-desc">
               Create your first WhatsApp survey to start collecting responses.
             </div>
             <Link href="/surveys/new" className="btn btn-primary btn-sm" style={{ marginTop: '8px' }}>
-              ➕ Create Survey
+              <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.5} />
+              Create Survey
             </Link>
           </div>
         ) : (
