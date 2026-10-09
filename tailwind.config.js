@@ -45,7 +45,12 @@ module.exports = {
         ongreen: 'var(--primary-foreground)',
         // Full shadcn-style token set (the @theme mapping, as utilities)
         background: 'var(--background)',
-        foreground: 'var(--foreground)',
+        foreground: {
+          DEFAULT: 'var(--foreground)',
+          // Row/hover tints: v3 can't do /opacity on var() colors.
+          faint: 'color-mix(in srgb, var(--foreground) 4%, transparent)',
+          soft: 'color-mix(in srgb, var(--foreground) 8%, transparent)',
+        },
         card: {
           DEFAULT: 'var(--card)',
           foreground: 'var(--card-foreground)',
