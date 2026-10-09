@@ -1,8 +1,15 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import type { ComponentProps, ReactNode } from 'react'
 import { createClient } from '@/lib/supabase-server'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Add01Icon, ZapIcon, ClipboardIcon } from '@hugeicons/core-free-icons'
+import {
+  Add01Icon,
+  CheckmarkCircle02Icon,
+  PieChartIcon,
+  ClipboardIcon,
+  Clock01Icon,
+} from '@hugeicons/core-free-icons'
 import {
   getSurveysWithStats,
   getAvgCompletionSeconds,
@@ -11,16 +18,15 @@ import {
 } from '@/lib/queries'
 import { formatDuration, whatsAppLink } from '@/lib/format'
 import CopyButton from '@/components/CopyButton'
-import { BarChart } from '@/components/charts/bar-chart'
+import { ActivityChart } from '@/components/charts/activity-chart'
 
 const BTN_PRIMARY_SM =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-3.5 py-1.5 font-sans text-[13px] font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
+  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85] disabled:cursor-default disabled:opacity-50'
 const BTN_SECONDARY_SM =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-border-strong bg-surface px-3.5 py-1.5 font-sans text-[13px] font-semibold text-ink transition-all duration-150 hover:bg-surface-2'
+  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-transparent px-3.5 font-sans text-[13px] font-medium text-foreground transition-all duration-150 hover:bg-muted'
 const BTN_GHOST_SM =
   'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-[13px] font-semibold text-ink-muted transition-all duration-150 hover:bg-surface-2 hover:text-ink'
-const CARD =
-  'rounded-lg border border-border bg-surface shadow-card transition-all hover:border-border-strong hover:shadow-hover'
+const CARD = 'rounded-lg border border-border bg-card p-6 text-card-foreground'
 
 function StatusBadge({ status }: { status: string }) {
   const tone =
@@ -35,6 +41,37 @@ function StatusBadge({ status }: { status: string }) {
     >
       {status === 'active' ? 'Live' : status}
     </span>
+  )
+}
+
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  subPositive,
+}: {
+  icon: ComponentProps<typeof HugeiconsIcon>['icon']
+  label: string
+  value: ReactNode
+  sub: string
+  subPositive?: boolean
+}) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-6 text-card-foreground">
+      <div
+        role="img"
+        aria-label={label}
+        title={label}
+        className="mb-4 flex h-[36px] w-[36px] items-center justify-center rounded-md bg-primary-tile text-green-text"
+      >
+        <HugeiconsIcon icon={Icon} size={18} color="currentColor" strokeWidth={1.5} />
+      </div>
+      <div className="text-[28px] font-semibold leading-none tabular-nums">{value}</div>
+      <div className={`mt-1.5 text-[13px] ${subPositive ? 'text-green-text' : 'text-muted-foreground'}`}>
+        {sub}
+      </div>
+    </div>
   )
 }
 
@@ -62,82 +99,92 @@ export default async function DashboardPage() {
 
   return (
     <div className="animate-fade-up">
-      <div className="mb-6 grid grid-cols-2 overflow-hidden rounded-lg border border-border bg-surface shadow-card transition-all hover:border-border-strong hover:shadow-hover xl:grid-cols-4">
-        <div className="min-w-0 border-border px-6 py-5 [&:not(:first-child)]:border-l max-xl:[&:nth-child(3)]:border-l-0 max-xl:[&:nth-child(n+3)]:border-t">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Completed Responses</div>
-          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{totalResponses}</div>
-          <div className="text-xs font-medium text-accent-fg">{responsesThisWeek} in the last 7 days</div>
-        </div>
-
-        <div className="min-w-0 border-border px-6 py-5 [&:not(:first-child)]:border-l max-xl:[&:nth-child(3)]:border-l-0 max-xl:[&:nth-child(n+3)]:border-t">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Completion Rate</div>
-          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{avgCompletionRate}%</div>
-          <div className="text-xs font-medium text-ink-muted">
-            {totalAttempts} attempt{totalAttempts === 1 ? '' : 's'} total
-          </div>
-        </div>
-
-        <div className="min-w-0 border-border px-6 py-5 [&:not(:first-child)]:border-l max-xl:[&:nth-child(3)]:border-l-0 max-xl:[&:nth-child(n+3)]:border-t">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Active Surveys</div>
-          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{activeSurveys}</div>
-          <div className="text-xs font-medium text-ink-muted">
-            100% automated via WhatsApp
-          </div>
-        </div>
-
-        <div className="min-w-0 border-border px-6 py-5 [&:not(:first-child)]:border-l max-xl:[&:nth-child(3)]:border-l-0 max-xl:[&:nth-child(n+3)]:border-t">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Avg. Completion Time</div>
-          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{avgSeconds !== null ? formatDuration(avgSeconds) : '—'}</div>
-          <div className="text-xs font-medium text-ink-muted">
-            <span className="mr-1 inline-flex align-middle">
-              <HugeiconsIcon icon={ZapIcon} size={13} strokeWidth={2} />
-            </span>
-            Instant WhatsApp responses
-          </div>
-        </div>
+      <div className="mb-5 grid gap-5 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]">
+        <StatCard
+          icon={CheckmarkCircle02Icon}
+          label="Completed responses"
+          value={totalResponses}
+          sub={`${responsesThisWeek} in the last 7 days`}
+          subPositive
+        />
+        <StatCard
+          icon={PieChartIcon}
+          label="Completion rate"
+          value={`${avgCompletionRate}%`}
+          sub={`${totalAttempts} attempt${totalAttempts === 1 ? '' : 's'} total`}
+        />
+        <StatCard
+          icon={ClipboardIcon}
+          label="Active surveys"
+          value={activeSurveys}
+          sub="100% automated via WhatsApp"
+        />
+        <StatCard
+          icon={Clock01Icon}
+          label="Avg. completion time"
+          value={avgSeconds !== null ? formatDuration(avgSeconds) : '—'}
+          sub={
+            avgSeconds !== null
+              ? `${Math.round(avgSeconds)} seconds total`
+              : 'No completions yet'
+          }
+        />
       </div>
 
-      <div className="mb-7 grid gap-6 max-lg:grid-cols-1 lg:grid-cols-[2fr_1fr]">
-        <div className={`${CARD} p-6`}>
+      <div className="mb-5 grid gap-5 max-[860px]:grid-cols-1 grid-cols-[2fr_1fr]">
+        <div className={`${CARD}`}>
           <div className="mb-5 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold">Response Activity</h3>
-              <p className="text-[13px] text-ink-muted">
+              <h3 className="text-[15px] font-semibold text-foreground">Response activity</h3>
+              <p className="text-[13px] text-muted-foreground">
                 Completed responses over the last 7 days
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-pill bg-accent-tint px-2.5 py-1 text-xs font-semibold tracking-[0.02em] text-accent-fg before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent-deep before:animate-pulse-dot before:content-['']">Live Engine</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-tile px-2 py-0.5 text-[12px] font-medium text-green-text">
+              <span aria-hidden="true" className="h-[6px] w-[6px] rounded-full bg-primary" />
+              Live
+            </span>
           </div>
 
-          <BarChart
-            name="Responses"
-            data={activity.map((a) => a.count)}
-            labels={activity.map((a) => a.day)}
-            showValues
-          />
+          <ActivityChart data={activity} />
         </div>
 
-        <div className={`${CARD} p-6`}>
-          <h3 className="mb-1 text-base font-bold">Recent Responses</h3>
-          <p className="mb-5 text-[13px] text-ink-muted">
-            Latest activity across all surveys
-          </p>
+        <div className={`${CARD}`}>
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h3 className="text-[15px] font-semibold text-foreground">Recent responses</h3>
+              <p className="text-[13px] text-muted-foreground">
+                Latest activity across all surveys
+              </p>
+            </div>
+            <Link href="/surveys" className="shrink-0 text-[13px] font-medium text-green-text">
+              View all
+            </Link>
+          </div>
 
           {recent.length === 0 ? (
-            <p className="text-[13px] text-ink-muted">No responses yet.</p>
+            <p className="text-[13px] text-muted-foreground">No responses yet.</p>
           ) : (
-            <div className="flex flex-col gap-3.5">
+            <div className="flex flex-col divide-y divide-border">
               {recent.map((r) => (
-                <div key={r.id} className="flex items-center justify-between gap-2">
-                  <div className="overflow-hidden">
-                    <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold text-ink">
+                <div key={r.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-[32px] w-[32px] shrink-0 items-center justify-center rounded-full bg-muted text-[12px] font-semibold text-muted-foreground"
+                  >
+                    {(r.surveyTitle || '?').charAt(0).toUpperCase()}
+                  </span>
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <div className="truncate text-[14px] font-medium text-foreground">
                       {r.surveyTitle}
                     </div>
-                    <div className="text-[11px] text-ink-muted">
+                    <div className="truncate text-[12px] text-muted-foreground">
                       {r.phone} · {r.time}
                     </div>
                   </div>
-                  <span className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold tracking-[0.02em] before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:content-[""] ${r.completed ? 'bg-accent-tint text-accent-fg before:animate-pulse-dot before:bg-accent-deep' : 'bg-danger-tint text-danger-fg before:bg-danger'}`}>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium ${r.completed ? 'bg-primary-tile text-green-text' : 'bg-warning-soft text-warning-ink'}`}
+                  >
                     {r.completed ? 'Done' : 'Partial'}
                   </span>
                 </div>
@@ -150,13 +197,13 @@ export default async function DashboardPage() {
       <div className={`${CARD} p-6`}>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold">My Surveys</h3>
-            <p className="text-[13px] text-ink-muted">
+            <h3 className="text-[15px] font-semibold">My Surveys</h3>
+            <p className="text-[13px] text-muted-foreground">
               Manage active WhatsApp entry points and track completion.
             </p>
           </div>
           <Link href="/surveys" className={BTN_SECONDARY_SM}>
-            View All Surveys →
+            View all surveys
           </Link>
         </div>
 
@@ -178,14 +225,14 @@ export default async function DashboardPage() {
           <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">Title</th>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">Status</th>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">Questions</th>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">Attempts</th>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">Completed</th>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">Completion Rate</th>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">WhatsApp Share</th>
-                <th className="border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted">Actions</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">Title</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">Status</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">Questions</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">Attempts</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">Completed</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">Completion rate</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">WhatsApp share</th>
+                <th className="border-b border-border px-4 py-3 text-left text-[13px] font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody>
