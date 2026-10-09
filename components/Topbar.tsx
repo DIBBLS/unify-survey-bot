@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { ZapIcon } from '@hugeicons/core-free-icons'
 import ThemeToggle from './ThemeToggle'
 
 export default function Topbar() {
@@ -30,7 +32,8 @@ export default function Topbar() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
         <ThemeToggle />
         <Link href="/surveys/new" className="btn btn-primary btn-sm">
-          <span>⚡ Create Survey</span>
+          <HugeiconsIcon icon={ZapIcon} size={14} strokeWidth={2} />
+          <span>Create Survey</span>
         </Link>
       </div>
     </header>

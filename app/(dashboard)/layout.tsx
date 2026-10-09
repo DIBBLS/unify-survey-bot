@@ -1,5 +1,4 @@
-import Sidebar from '@/components/Sidebar'
-import Topbar from '@/components/Topbar'
+import DashboardShell from '@/components/dashboard-shell'
 import { createClient } from '@/lib/supabase-server'
 
 export default async function DashboardLayout({
@@ -13,12 +12,6 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser()
 
   return (
-    <div className="app-shell">
-      <Sidebar userEmail={user?.email ?? null} />
-      <div className="main-content">
-        <Topbar />
-        <main className="page-content">{children}</main>
-      </div>
-    </div>
+    <DashboardShell userEmail={user?.email ?? null}>{children}</DashboardShell>
   )
 }
