@@ -1,8 +1,20 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
+
+// Tailwind v4 derives every spacing utility from --spacing (0.275rem here).
+// v3 uses a static scale, so replicate it: default scale x 1.1 (0.25 -> 0.275).
+const spacing = Object.fromEntries(
+  Object.entries(defaultTheme.spacing).map(([key, value]) => {
+    const match = /^(-?[\d.]+)rem$/.exec(value)
+    return [key, match ? `${parseFloat((parseFloat(match[1]) * 1.1).toFixed(4))}rem` : value]
+  })
+)
+
 module.exports = {
   content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      spacing,
       colors: {
         canvas: 'var(--background)',
         surface: 'var(--card)',
@@ -45,6 +57,10 @@ module.exports = {
         primary: {
           DEFAULT: 'var(--primary)',
           foreground: 'var(--primary-foreground)',
+          // v3 cannot apply /opacity modifiers to var() colors, so the
+          // translucent steps are pre-mixed tokens (bg-primary-soft etc.).
+          soft: 'color-mix(in srgb, var(--primary) 15%, transparent)',
+          tile: 'color-mix(in srgb, var(--primary) 14%, transparent)',
         },
         secondary: {
           DEFAULT: 'var(--secondary)',
@@ -53,10 +69,17 @@ module.exports = {
         muted: {
           DEFAULT: 'var(--muted)',
           foreground: 'var(--muted-foreground)',
+          soft: 'color-mix(in srgb, var(--muted) 60%, transparent)',
         },
         destructive: {
           DEFAULT: 'var(--destructive)',
           foreground: 'var(--destructive-foreground)',
+          soft: 'color-mix(in srgb, var(--destructive) 10%, transparent)',
+        },
+        warning: {
+          DEFAULT: 'var(--warning)',
+          soft: 'color-mix(in srgb, var(--warning) 18%, transparent)',
+          ink: 'color-mix(in srgb, var(--warning) 70%, var(--foreground))',
         },
         input: 'var(--input)',
         ring: 'var(--ring)',
