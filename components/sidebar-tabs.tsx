@@ -176,6 +176,7 @@ function Shell({
   const router = useRouter();
   const { open } = useSidebar();
   const [surveys, setSurveys] = useState<SurveyEntry[]>([]);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Instant nav: warm the route bundles once the shell mounts so the first
   // click never pays compile + fetch latency.
@@ -243,27 +244,40 @@ function Shell({
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Workspace</SidebarGroupLabel>
-            <SidebarMenu>
-              {NAV_ITEMS.filter((item) => item.id !== 'surveys').map((item) => (
+            <SidebarMenu
+              onMouseLeave={() => setHoveredId(null)}
+              onBlur={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                  setHoveredId(null);
+                }
+              }}
+            >
+              {NAV_ITEMS.filter((item) => item.id !== 'surveys').map((item) => {
+                const itemActive = isActiveHref(item.href, activeHref);
+                return (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     tooltip={item.label}
-                    isActive={isActiveHref(item.href, activeHref)}
+                    isActive={itemActive}
+                    highlighted={hoveredId === item.id}
                     onClick={() => go(item.href)}
-                    onMouseEnter={() => router.prefetch(item.href)}
-                    onFocus={() => router.prefetch(item.href)}
+                    onMouseEnter={() => {
+                      router.prefetch(item.href);
+                      setHoveredId(item.id);
+                    }}
+                    onFocus={() => {
+                      router.prefetch(item.href);
+                      setHoveredId(item.id);
+                    }}
                   >
-                    {open ? (
-                      <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
-                    ) : (
-                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-accent">
-                        <HugeiconsIcon icon={item.icon} size={22} strokeWidth={1.8} />
-                      </span>
-                    )}
+                    <span className={`inline-flex ${itemActive ? 'text-green-text' : ''}`}>
+                      <HugeiconsIcon icon={item.icon} size={18} strokeWidth={1.5} color="currentColor" />
+                    </span>
                     {open && <span>{item.label}</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+                );
+              })}
 
               <CollapsiblePrimitive.Root
                 defaultOpen={surveysOpen || undefined}
@@ -274,16 +288,19 @@ function Shell({
                     <SidebarMenuButton
                       tooltip="Surveys"
                       isActive={isActiveHref('/surveys', activeHref)}
-                      onMouseEnter={() => router.prefetch('/surveys')}
-                      onFocus={() => router.prefetch('/surveys')}
+                      highlighted={hoveredId === 'surveys'}
+                      onMouseEnter={() => {
+                        router.prefetch('/surveys');
+                        setHoveredId('surveys');
+                      }}
+                      onFocus={() => {
+                        router.prefetch('/surveys');
+                        setHoveredId('surveys');
+                      }}
                     >
-                      {open ? (
-                        <HugeiconsIcon icon={ClipboardIcon} size={20} strokeWidth={1.8} />
-                      ) : (
-                        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-accent">
-                          <HugeiconsIcon icon={ClipboardIcon} size={22} strokeWidth={1.8} />
-                        </span>
-                      )}
+                      <span className={`inline-flex ${isActiveHref('/surveys', activeHref) ? 'text-green-text' : ''}`}>
+                        <HugeiconsIcon icon={ClipboardIcon} size={18} strokeWidth={1.5} color="currentColor" />
+                      </span>
                       {open && <span>Surveys</span>}
                       {open && (
                         <span className="ml-auto transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90">
