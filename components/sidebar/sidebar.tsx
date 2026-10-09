@@ -45,16 +45,21 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   const [open, setOpenState] = useState(true);
   const [openMobile, setOpenMobile] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
 
-  if (typeof window !== 'undefined' && !hydrated) {
+  // Apply the persisted preference after hydration, never during render:
+  // the server always renders expanded, so the first client render must
+  // match it. Reading localStorage during render mismatches the SSR HTML,
+  // forces React to discard the hydrated tree, and crashes portal refs
+  // while tearing it down (dead toggle, no animation).
+  useEffect(() => {
     try {
-      setOpenState(localStorage.getItem(COLLAPSE_KEY) !== '1');
+      if (localStorage.getItem(COLLAPSE_KEY) === '1') {
+        setOpenState(false);
+      }
     } catch {
       // Storage unavailable: keep expanded.
     }
-    setHydrated(true);
-  }
+  }, []);
 
   const setOpen = useCallback((next: boolean) => {
     setOpenState(next);
@@ -177,6 +182,8 @@ export function SidebarGroup({ children }: { children: ReactNode }) {
 }
 
 export function SidebarGroupLabel({ children }: { children: ReactNode }) {
+  const { open } = useSidebar();
+  if (!open) return null;
   return (
     <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted first:pt-0">
       {children}
@@ -223,7 +230,7 @@ export function SidebarMenuButton({
         MENU_BUTTON,
         isActive
           ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
-          : 'font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+          : 'font-medium text-sidebar-foreground hover:bg-[color-mix(in_srgb,var(--sidebar-accent)55%,var(--sidebar-foreground))] hover:text-sidebar-accent-foreground',
         !open && 'justify-center px-0',
         className
       )}
@@ -280,7 +287,7 @@ export function SidebarMenuSubButton({
         'flex w-full items-center gap-2 overflow-hidden rounded-md px-2 py-1.5 text-left text-[13px] transition-colors duration-150',
         isActive
           ? 'font-semibold text-sidebar-accent-foreground'
-          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+          : 'text-sidebar-foreground hover:bg-[color-mix(in_srgb,var(--sidebar-accent)55%,var(--sidebar-foreground))] hover:text-sidebar-accent-foreground'
       )}
     >
       {children}
