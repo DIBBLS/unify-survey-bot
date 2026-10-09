@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { PencilEdit02Icon } from '@hugeicons/core-free-icons'
 
 export default function SurveyEditPanel({
   surveyId,
@@ -67,7 +69,8 @@ export default function SurveyEditPanel({
             {initialStatus === 'active' ? 'Live Bot' : initialStatus}
           </span>
           <button onClick={startEdit} className="btn btn-ghost btn-sm">
-            ✏️ Edit
+            <HugeiconsIcon icon={PencilEdit02Icon} size={14} strokeWidth={2} />
+            Edit
           </button>
         </div>
         <p className="page-subtitle">{initialDescription || 'No description'}</p>

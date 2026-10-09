@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase-server'
 import { getSurveysWithStats } from '@/lib/queries'
 import { whatsAppLink } from '@/lib/format'
 import CopyButton from '@/components/CopyButton'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Add01Icon, ClipboardIcon } from '@hugeicons/core-free-icons'
 
 const TABS = ['all', 'active', 'draft', 'closed'] as const
 
@@ -30,7 +32,8 @@ export default async function SurveysPage({
           <p className="page-subtitle">Create, deploy, and monitor your WhatsApp survey bots.</p>
         </div>
         <Link href="/surveys/new" className="btn btn-primary">
-          ➕ New WhatsApp Survey
+          <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.5} />
+          New WhatsApp Survey
         </Link>
       </div>
 
@@ -66,7 +69,9 @@ export default async function SurveysPage({
 
       {filtered.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📋</div>
+          <div className="empty-state-icon" style={{ display: 'flex', justifyContent: 'center' }}>
+            <HugeiconsIcon icon={ClipboardIcon} size={40} strokeWidth={1.5} />
+          </div>
           <div className="empty-state-title">
             {allSurveys.length === 0 ? 'No surveys yet' : `No ${status} surveys`}
           </div>
@@ -76,7 +81,8 @@ export default async function SurveysPage({
               : 'Try a different filter, or create a new survey.'}
           </div>
           <Link href="/surveys/new" className="btn btn-primary btn-sm" style={{ marginTop: '8px' }}>
-            ➕ New WhatsApp Survey
+            <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.5} />
+            New WhatsApp Survey
           </Link>
         </div>
       ) : (

@@ -1,5 +1,7 @@
 import { headers } from 'next/headers'
 import CopyButton from '@/components/CopyButton'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Copy01Icon, Tick01Icon, BookOpen01Icon } from '@hugeicons/core-free-icons'
 
 function isConfigured(name: string) {
   const value = process.env[name]
@@ -87,13 +89,29 @@ export default function SettingsPage() {
             }}
           >
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{webhookUrl}</span>
-            <CopyButton text={webhookUrl} label="Copy" copiedLabel="✓ Copied" className="btn btn-ghost btn-sm" />
+            <CopyButton
+              text={webhookUrl}
+              label={
+                <>
+                  <HugeiconsIcon icon={Copy01Icon} size={14} strokeWidth={2} />
+                  Copy
+                </>
+              }
+              copiedLabel={
+                <>
+                  <HugeiconsIcon icon={Tick01Icon} size={14} strokeWidth={2.5} />
+                  Copied
+                </>
+              }
+              className="btn btn-ghost btn-sm"
+            />
           </div>
         </div>
 
         <div className="glass-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
-            📖 How to Connect Your WhatsApp Number (Step-by-Step)
+          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <HugeiconsIcon icon={BookOpen01Icon} size={18} strokeWidth={2} />
+            How to Connect Your WhatsApp Number (Step-by-Step)
           </h3>
 
           <ol style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: '20px', fontSize: '14px', color: 'var(--text-muted)' }}>

@@ -6,6 +6,9 @@ import { formatDuration, whatsAppLink } from '@/lib/format'
 import CopyButton from '@/components/CopyButton'
 import PrintButton from '@/components/PrintButton'
 import SurveyEditPanel from '@/components/SurveyEditPanel'
+import { SurveyTabTitle } from '@/components/sidebar-tabs'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Link01Icon, Tick01Icon } from '@hugeicons/core-free-icons'
 
 const BAR_COLORS = ['var(--green-deep)', 'var(--green)', 'var(--border-strong)', 'var(--text-subtle)']
 
@@ -21,6 +24,7 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
 
   return (
     <div className="animate-fade-up">
+      <SurveyTabTitle title={survey.title} />
       <div className="page-header">
         <div>
           <Link href="/surveys" style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'inline-block', marginBottom: '4px' }}>
@@ -34,7 +38,21 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
           />
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <CopyButton text={whatsAppLink(survey.id)} label="🔗 Share WA Link" copiedLabel="✓ Copied!" />
+          <CopyButton
+            text={whatsAppLink(survey.id)}
+            label={
+              <>
+                <HugeiconsIcon icon={Link01Icon} size={14} strokeWidth={2} />
+                Share WA Link
+              </>
+            }
+            copiedLabel={
+              <>
+                <HugeiconsIcon icon={Tick01Icon} size={14} strokeWidth={2.5} />
+                Copied!
+              </>
+            }
+          />
           <PrintButton />
         </div>
       </div>

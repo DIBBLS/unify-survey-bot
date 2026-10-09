@@ -1,17 +1,29 @@
 'use client'
 
 import { useState } from 'react'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { Link01Icon, Tick01Icon } from '@hugeicons/core-free-icons'
 
 export default function CopyButton({
   text,
-  label = '🔗 Copy WA Link',
-  copiedLabel = '✓ Copied',
+  label = (
+    <>
+      <HugeiconsIcon icon={Link01Icon} size={14} strokeWidth={2} />
+      Copy WA Link
+    </>
+  ),
+  copiedLabel = (
+    <>
+      <HugeiconsIcon icon={Tick01Icon} size={14} strokeWidth={2.5} />
+      Copied
+    </>
+  ),
   className = 'btn btn-secondary btn-sm',
   style,
 }: {
   text: string
-  label?: string
-  copiedLabel?: string
+  label?: React.ReactNode
+  copiedLabel?: React.ReactNode
   className?: string
   style?: React.CSSProperties
 }) {

@@ -3,6 +3,16 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { HugeiconsIcon } from '@hugeicons/react'
+import {
+  Rocket01Icon,
+  Add01Icon,
+  Cancel01Icon,
+  WavingHand01Icon,
+  StarIcon,
+  CheckmarkCircle02Icon,
+  LockIcon,
+} from '@hugeicons/core-free-icons'
 
 interface DraftQuestion {
   id: string
@@ -134,7 +144,14 @@ export default function NewSurveyPage() {
               Cancel
             </button>
             <button onClick={handlePublish} className="btn btn-primary" disabled={publishing}>
-              {publishing ? 'Publishing…' : '🚀 Publish Survey Bot'}
+              {publishing ? (
+                'Publishing…'
+              ) : (
+                <>
+                  <HugeiconsIcon icon={Rocket01Icon} size={16} strokeWidth={2} />
+                  Publish Survey Bot
+                </>
+              )}
             </button>
           </div>
           {publishError && (
@@ -183,7 +200,8 @@ export default function NewSurveyPage() {
                 Questions ({questions.length})
               </h3>
               <button onClick={addQuestion} className="btn btn-secondary btn-sm">
-                ➕ Add Question
+                <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.5} />
+                Add Question
               </button>
             </div>
 
@@ -269,8 +287,9 @@ export default function NewSurveyPage() {
                               onClick={() => removeOption(activeQuestionIndex, oIdx)}
                               className="btn btn-ghost btn-sm"
                               style={{ color: 'var(--red)' }}
+                              aria-label="Remove option"
                             >
-                              ✕
+                              <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2} />
                             </button>
                           )}
                         </div>
@@ -356,7 +375,12 @@ export default function NewSurveyPage() {
                   boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
                 }}
               >
-                <strong>👋 {title || 'Survey Title'}</strong>
+                <strong>
+                  <span style={{ display: 'inline-flex', verticalAlign: 'middle', marginRight: '4px' }}>
+                    <HugeiconsIcon icon={WavingHand01Icon} size={14} strokeWidth={1.8} />
+                  </span>
+                  {title || 'Survey Title'}
+                </strong>
                 <br />
                 {description || 'Survey description will appear here...'}
               </div>
@@ -406,7 +430,7 @@ export default function NewSurveyPage() {
                   {currentQ.type === 'rating' && (
                     <div style={{ display: 'flex', gap: '4px', marginTop: '10px', justifyContent: 'center' }}>
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} style={{ fontSize: '18px' }}>⭐</span>
+                        <HugeiconsIcon key={star} icon={StarIcon} size={18} strokeWidth={1.8} color="#FFC107" />
                       ))}
                     </div>
                   )}
@@ -414,11 +438,13 @@ export default function NewSurveyPage() {
                   {/* Yes/No Preview */}
                   {currentQ.type === 'yes_no' && (
                     <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                      <div style={{ flex: 1, background: '#111b21', color: '#00a884', padding: '8px', borderRadius: '8px', textAlign: 'center', fontWeight: 600, fontSize: '12px', border: '1px solid #00a884' }}>
-                        ✅ Yes
+                      <div style={{ flex: 1, background: '#111b21', color: '#00a884', padding: '8px', borderRadius: '8px', textAlign: 'center', fontWeight: 600, fontSize: '12px', border: '1px solid #00a884', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                        <HugeiconsIcon icon={CheckmarkCircle02Icon} size={14} strokeWidth={2} />
+                        Yes
                       </div>
-                      <div style={{ flex: 1, background: '#111b21', color: '#ea4335', padding: '8px', borderRadius: '8px', textAlign: 'center', fontWeight: 600, fontSize: '12px', border: '1px solid #ea4335' }}>
-                        ❌ No
+                      <div style={{ flex: 1, background: '#111b21', color: '#ea4335', padding: '8px', borderRadius: '8px', textAlign: 'center', fontWeight: 600, fontSize: '12px', border: '1px solid #ea4335', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                        <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2} />
+                        No
                       </div>
                     </div>
                   )}
@@ -427,8 +453,9 @@ export default function NewSurveyPage() {
             </div>
 
             {/* Bottom Note */}
-            <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '11px', color: '#8696a0' }}>
-              🔒 Powered by Meta WhatsApp Cloud API
+            <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '11px', color: '#8696a0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+              <HugeiconsIcon icon={LockIcon} size={11} strokeWidth={2} />
+              Powered by Meta WhatsApp Cloud API
             </div>
           </div>
         </div>

@@ -254,12 +254,12 @@ export async function getSurveyDetail(
       }))
     } else if (q.type === 'yes_no') {
       counts = [
-        { label: '✅ Yes', count: qAnswers.filter((a: any) => a.text_answer === 'yes').length },
-        { label: '❌ No', count: qAnswers.filter((a: any) => a.text_answer === 'no').length },
+        { label: 'Yes', count: qAnswers.filter((a: any) => a.text_answer === 'yes').length },
+        { label: 'No', count: qAnswers.filter((a: any) => a.text_answer === 'no').length },
       ]
     } else {
       counts = [1, 2, 3, 4, 5].map((n) => ({
-        label: `${'⭐'.repeat(n)} ${n}/5`,
+        label: `${n}/5`,
         count: qAnswers.filter((a: any) => a.text_answer === String(n)).length,
       }))
     }
