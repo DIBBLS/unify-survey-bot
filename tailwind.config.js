@@ -101,10 +101,11 @@ module.exports = {
           ring: 'var(--sidebar-ring)',
         },
         'green-text': 'var(--green-text)',
-        warning: 'var(--warning)',
       },
       fontFamily: {
-        display: ['var(--font-serif)'],
+        // Inter for everything (headings included): display maps to the
+        // sans stack so legacy `font-display` utilities stop emitting serif.
+        display: ['var(--font-sans)'],
         sans: ['var(--font-sans)'],
         mono: ['var(--font-mono)'],
       },
