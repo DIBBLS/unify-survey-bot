@@ -189,7 +189,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => switchMode('reset')}
                   variant="ghost"
-                  style={{ fontSize: '12px', color: 'var(--text-muted)', padding: '2px 0', justifyContent: 'flex-end', alignSelf: 'flex-end' }}
+                  style={{ fontSize: '12px', color: 'var(--muted-foreground)', padding: '2px 0', justifyContent: 'flex-end', alignSelf: 'flex-end' }}
                 >
                   Forgot password?
                 </Button>

@@ -55,7 +55,7 @@ export default function UpdatePasswordPage() {
             <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">New Password</label>
             <input
               type="password"
-              className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -68,7 +68,7 @@ export default function UpdatePasswordPage() {
             <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Confirm New Password</label>
             <input
               type="password"
-              className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
