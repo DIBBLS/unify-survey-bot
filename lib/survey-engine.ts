@@ -305,10 +305,29 @@ export async function handleIncomingMessage(
       if (activeSession) {
         await restartSurvey(phoneNumber, activeSession)
       } else {
-        await sendTextMessage(
-          phoneNumber,
-          'There is no survey in progress on this number.\n\nPlease use a valid survey link to get started.'
-        )
+        // No live session: a finished respondent has only history. Pointing
+        // them at a link that would just say "already recorded" is a
+        // confusing two-step — say it directly.
+        const { data: lastDone } = await supabase
+          .from('responses')
+          .select('surveys(title)')
+          .eq('phone_number', phoneNumber)
+          .eq('completed', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        const doneTitle = (lastDone as any)?.surveys?.title
+        if (lastDone) {
+          await sendTextMessage(
+            phoneNumber,
+            `Thanks — your response${doneTitle ? ` to *${doneTitle}*` : ''} is already recorded.`
+          )
+        } else {
+          await sendTextMessage(
+            phoneNumber,
+            'There is no survey in progress on this number.\n\nPlease use a valid survey link to get started.'
+          )
+        }
       }
       return
     }
