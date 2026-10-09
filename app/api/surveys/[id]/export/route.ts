@@ -4,9 +4,9 @@ import { buildSurveyCsv, exportFilename } from '@/lib/export-csv'
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -14,10 +14,11 @@ export async function GET(
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
+  const { id } = await params
   const { data: survey, error } = await supabase
     .from('surveys')
     .select('title, questions(*, options(*))')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
@@ -28,7 +29,7 @@ export async function GET(
   const { data: responses, error: responsesError } = await supabase
     .from('responses')
     .select('id, phone_number, completed, created_at')
-    .eq('survey_id', params.id)
+    .eq('survey_id', id)
     .order('created_at', { ascending: true })
 
   // Never serve a silent partial export: a failed query must 500 rather

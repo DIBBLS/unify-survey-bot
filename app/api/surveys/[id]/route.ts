@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -11,10 +11,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
+  const { id } = await params
   const { data: survey, error } = await supabase
     .from('surveys')
     .select('*, questions(*, options(*))')
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
@@ -25,8 +26,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json({ survey })
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -55,10 +56,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     updates.updated_at = new Date().toISOString()
 
+    const { id } = await params
     const { data: survey, error } = await supabase
       .from('surveys')
       .update(updates)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .select()
       .single()
@@ -73,8 +75,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const supabase = createClient()
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -83,10 +85,11 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
+  const { id } = await params
   const { error } = await supabase
     .from('surveys')
     .delete()
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
 
   if (error) {

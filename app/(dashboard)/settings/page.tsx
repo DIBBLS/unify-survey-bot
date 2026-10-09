@@ -12,8 +12,9 @@ function isConfigured(name: string) {
 const CARD =
   'rounded-lg border border-border bg-surface p-6 shadow-card transition-all hover:border-border-strong hover:shadow-hover'
 
-export default function SettingsPage() {
-  const host = headers().get('host') ?? 'your-project.vercel.app'
+export default async function SettingsPage() {
+  const headersList = await headers()
+  const host = headersList.get('host') ?? 'your-project.vercel.app'
   const protocol = host.startsWith('localhost') ? 'http' : 'https'
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || `${protocol}://${host}`
   const webhookUrl = `${siteUrl}/api/webhook`

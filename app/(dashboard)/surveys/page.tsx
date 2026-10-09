@@ -19,15 +19,16 @@ const CARD =
 export default async function SurveysPage({
   searchParams,
 }: {
-  searchParams: { status?: string }
+  searchParams: Promise<{ status?: string }>
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const status = searchParams.status ?? 'all'
+  const { status: statusParam } = await searchParams
+  const status = statusParam ?? 'all'
   const allSurveys = await getSurveysWithStats(supabase, user.id)
   const filtered = status === 'all' ? allSurveys : allSurveys.filter((s) => s.status === status)
 
