@@ -11,6 +11,13 @@ import { Link01Icon, Tick01Icon, Download01Icon } from '@hugeicons/core-free-ico
 
 const BAR_COLORS = ['var(--green-deep)', 'var(--green)', 'var(--border-strong)', 'var(--text-subtle)']
 
+const BTN_SECONDARY =
+  'inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-border-strong bg-surface px-6 py-3 font-sans text-sm font-semibold text-ink transition-all duration-150 hover:bg-surface-2'
+const CARD =
+  'rounded-lg border border-border bg-surface shadow-card transition-all hover:border-border-strong hover:shadow-hover'
+const TH =
+  'border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted'
+
 export default async function SurveyResultsPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
   const {
@@ -23,9 +30,9 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
 
   return (
     <div className="animate-fade-up">
-      <div className="page-header">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <Link href="/surveys" style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'inline-block', marginBottom: '4px' }}>
+          <Link href="/surveys" className="mb-1 inline-block text-[13px] text-ink-muted">
             ← Back to Surveys
           </Link>
           <SurveyEditPanel
@@ -35,7 +42,7 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
             initialStatus={survey.status}
           />
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="flex gap-3">
           <CopyButton
             text={whatsAppLink(survey.id)}
             label={
@@ -53,7 +60,7 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
           />
           <a
             href={`/api/surveys/${survey.id}/export`}
-            className="btn btn-secondary"
+            className={BTN_SECONDARY}
             download
           >
             <HugeiconsIcon icon={Download01Icon} size={14} strokeWidth={2} />
@@ -63,121 +70,120 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
         </div>
       </div>
 
-      <div className="stats-grid">
-        <div className="glass-card stat-card">
-          <div className="stat-label">Completed Responses</div>
-          <div className="stat-value">{survey.completed}</div>
-          <div className="stat-change positive">Out of {survey.attempts} attempts</div>
+      <div className="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
+        <div className={`${CARD} flex flex-col gap-2 p-5`}>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Completed Responses</div>
+          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{survey.completed}</div>
+          <div className="text-xs font-medium text-accent-fg">Out of {survey.attempts} attempts</div>
         </div>
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Completion Rate</div>
-          <div className="stat-value">{survey.completionRate}%</div>
-          <div className="stat-change">
+        <div className={`${CARD} flex flex-col gap-2 p-5`}>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Completion Rate</div>
+          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{survey.completionRate}%</div>
+          <div className="text-xs font-medium text-ink-muted">
             {survey.completionRate >= 60 ? 'High Engagement' : survey.attempts === 0 ? 'No attempts yet' : 'Room to improve'}
           </div>
         </div>
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Avg. Completion Time</div>
-          <div className="stat-value">{survey.avgSeconds !== null ? formatDuration(survey.avgSeconds) : '—'}</div>
-          <div className="stat-change">
+        <div className={`${CARD} flex flex-col gap-2 p-5`}>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Avg. Completion Time</div>
+          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{survey.avgSeconds !== null ? formatDuration(survey.avgSeconds) : '—'}</div>
+          <div className="text-xs font-medium text-ink-muted">
             {survey.avgSeconds !== null ? `${Math.round(survey.avgSeconds)} seconds total` : 'No completions yet'}
           </div>
         </div>
 
-        <div className="glass-card stat-card">
-          <div className="stat-label">Drop-off Rate</div>
-          <div className="stat-value">{survey.dropOffRate}%</div>
-          <div className="stat-change">
+        <div className={`${CARD} flex flex-col gap-2 p-5`}>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Drop-off Rate</div>
+          <div className="font-display text-[34px] font-black leading-none tracking-[-1px] text-ink">{survey.dropOffRate}%</div>
+          <div className="text-xs font-medium text-ink-muted">
             {survey.attempts === 0 ? 'No attempts yet' : `${survey.attempts - survey.completed} abandoned`}
           </div>
         </div>
       </div>
 
-      <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '16px', color: 'var(--text)' }}>
+      <h2 className="mb-4 text-lg font-bold text-ink">
         Question Breakdown & Results
       </h2>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '32px' }}>
+      <div className="mb-8 flex flex-col gap-5">
         {survey.questions.map((q, idx) => (
-          <div key={q.id} className="glass-card" style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <div key={q.id} className={`${CARD} p-6`}>
+            <div className="mb-4 flex items-start justify-between">
               <div>
-                <div style={{ fontSize: '12px', color: 'var(--green-text)', fontWeight: 700, textTransform: 'uppercase' }}>
+                <div className="text-xs font-bold uppercase text-accent-fg">
                   Question {idx + 1}
                 </div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)', marginTop: '2px' }}>
+                <h3 className="mt-0.5 text-base font-bold text-ink">
                   {q.text}
                 </h3>
               </div>
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', background: 'var(--tag-bg)', padding: '4px 12px', borderRadius: '999px' }}>
+              <span className="rounded-pill bg-tag px-3 py-1 text-[13px] text-ink-muted">
                 {q.answersCount} answer{q.answersCount === 1 ? '' : 's'}
               </span>
             </div>
 
             {q.breakdown ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div className="flex flex-col gap-3.5">
                 {q.breakdown.map((opt, i) => (
                   <div key={i}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '6px' }}>
-                      <span style={{ color: 'var(--text)', fontWeight: 500 }}>{opt.label}</span>
-                      <span style={{ color: 'var(--text-muted)' }}>
+                    <div className="mb-1.5 flex justify-between text-[13px]">
+                      <span className="font-medium text-ink">{opt.label}</span>
+                      <span className="text-ink-muted">
                         <strong>{opt.count}</strong> ({opt.percent}%)
                       </span>
                     </div>
-                    <div style={{ width: '100%', height: '10px', background: 'var(--tag-bg)', borderRadius: '5px', overflow: 'hidden' }}>
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-tag">
                       <div
                         style={{
                           width: `${opt.percent}%`,
-                          height: '100%',
                           background: BAR_COLORS[i % BAR_COLORS.length],
-                          borderRadius: '5px',
                         }}
+                        className="h-full rounded-full"
                       />
                     </div>
                   </div>
                 ))}
               </div>
             ) : q.textAnswers && q.textAnswers.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '220px', overflowY: 'auto' }}>
+              <div className="flex max-h-[220px] flex-col gap-2 overflow-y-auto">
                 {q.textAnswers.map((answer, i) => (
-                  <div key={i} style={{ fontSize: '13px', color: 'var(--text-muted)', background: 'var(--tag-bg)', padding: '10px 14px', borderRadius: 'var(--radius-md)' }}>
+                  <div key={i} className="rounded-md bg-tag px-3.5 py-2.5 text-[13px] text-ink-muted">
                     {answer}
                   </div>
                 ))}
               </div>
             ) : (
-              <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No responses yet.</p>
+              <p className="text-[13px] text-ink-muted">No responses yet.</p>
             )}
           </div>
         ))}
       </div>
 
-      <div className="glass-card" style={{ padding: '24px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>Recent Respondent Log</h3>
-        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+      <div className={`${CARD} p-6`}>
+        <h3 className="mb-1 text-lg font-bold">Recent Respondent Log</h3>
+        <p className="mb-4 text-[13px] text-ink-muted">
           Real-time incoming responses over WhatsApp
         </p>
 
         {survey.responses.length === 0 ? (
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No respondents yet — share the WhatsApp link above.</p>
+          <p className="text-[13px] text-ink-muted">No respondents yet — share the WhatsApp link above.</p>
         ) : (
-          <table className="data-table">
+          <table className="w-full border-collapse">
             <thead>
               <tr>
-                <th>WhatsApp Contact</th>
-                <th>Time</th>
-                <th>Status</th>
+                <th className={TH}>WhatsApp Contact</th>
+                <th className={TH}>Time</th>
+                <th className={TH}>Status</th>
               </tr>
             </thead>
             <tbody>
-              {survey.responses.map((resp) => (
-                <tr key={resp.id}>
-                  <td style={{ fontWeight: 600 }}>{resp.phone}</td>
-                  <td style={{ color: 'var(--text-muted)' }}>{resp.time}</td>
-                  <td>
-                    <span className={`badge badge-${resp.completed ? 'active' : 'closed'}`}>
+              {survey.responses.map((resp, i, arr) => (
+                <tr key={resp.id} className="transition-colors hover:bg-surface-2">
+                  <td className={`p-4 text-sm font-semibold ${i === arr.length - 1 ? '' : 'border-b border-border'}`}>{resp.phone}</td>
+                  <td className={`p-4 text-sm text-ink-muted ${i === arr.length - 1 ? '' : 'border-b border-border'}`}>{resp.time}</td>
+                  <td className={`p-4 text-sm ${i === arr.length - 1 ? '' : 'border-b border-border'}`}>
+                    <span className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold tracking-[0.02em] before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:content-[""] ${resp.completed ? 'bg-accent-tint text-accent-fg before:animate-pulse-dot before:bg-accent-deep' : 'bg-danger-tint text-danger-fg before:bg-danger'}`}>
                       {resp.completed ? 'Completed' : 'Abandoned'}
                     </span>
                   </td>

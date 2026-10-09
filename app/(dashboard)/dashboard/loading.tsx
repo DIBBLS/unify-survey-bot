@@ -1,13 +1,16 @@
+const SHIMMER =
+  'animate-[shimmer_1.5s_infinite] rounded-md bg-[linear-gradient(90deg,var(--surface-2)_25%,var(--border)_50%,var(--surface-2)_75%)] bg-[length:200%_100%]'
+
 export default function DashboardLoading() {
   return (
     <div>
-      <div className="stats-grid">
+      <div className="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="skeleton" style={{ height: '120px' }} />
+          <div key={i} className={SHIMMER} style={{ height: '120px' }} />
         ))}
       </div>
-      <div className="skeleton" style={{ height: '280px', marginBottom: '28px' }} />
-      <div className="skeleton" style={{ height: '320px' }} />
+      <div className={SHIMMER} style={{ height: '280px', marginBottom: '28px' }} />
+      <div className={SHIMMER} style={{ height: '320px' }} />
     </div>
   )
 }

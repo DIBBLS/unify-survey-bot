@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { headers } from 'next/headers'
 import CopyButton from '@/components/CopyButton'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -7,6 +8,9 @@ function isConfigured(name: string) {
   const value = process.env[name]
   return Boolean(value && !value.startsWith('placeholder'))
 }
+
+const CARD =
+  'rounded-lg border border-border bg-surface p-6 shadow-card transition-all hover:border-border-strong hover:shadow-hover'
 
 export default function SettingsPage() {
   const host = headers().get('host') ?? 'your-project.vercel.app'
@@ -25,38 +29,38 @@ export default function SettingsPage() {
   ]
 
   return (
-    <div className="animate-fade-up" style={{ maxWidth: '900px' }}>
-      <div className="page-header">
+    <div className="animate-fade-up max-w-[900px]">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="page-title">Settings & Meta Setup</h1>
-          <p className="page-subtitle">
+          <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">Settings & Meta Setup</h1>
+          <p className="mt-1 text-sm text-ink-muted">
             Meta WhatsApp Cloud API and Supabase credentials live in environment variables,
             not in this page — that keeps long-lived secrets out of the database entirely.
           </p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div className="glass-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>
+      <div className="flex flex-col gap-6">
+        <div className={CARD}>
+          <h3 className="mb-4 text-base font-bold">
             Configuration Status
           </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
-            Set these in <code style={{ color: 'var(--green-text)' }}>.env.local</code> for local
-            development, or in your Vercel project's Environment Variables for production.
+          <p className="mb-4 text-[13px] text-ink-muted">
+            Set these in <code className="text-accent-fg">.env.local</code> for local
+            development, or in your Vercel project&apos;s Environment Variables for production.
             Values themselves are never shown here.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="flex flex-col gap-2.5">
             {checks.map((check) => {
               const configured = isConfigured(check.env)
               return (
-                <div key={check.env} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--tag-bg)', borderRadius: 'var(--radius-md)' }}>
+                <div key={check.env} className="flex items-center justify-between rounded-md bg-tag px-3.5 py-2.5">
                   <div>
-                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>{check.label}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{check.env}</div>
+                    <div className="text-[13px] font-semibold text-ink">{check.label}</div>
+                    <div className="font-mono text-[11px] text-ink-muted">{check.env}</div>
                   </div>
-                  <span className={`badge badge-${configured ? 'active' : 'closed'}`}>
+                  <span className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold tracking-[0.02em] before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:content-[""] ${configured ? 'bg-accent-tint text-accent-fg before:animate-pulse-dot before:bg-accent-deep' : 'bg-danger-tint text-danger-fg before:bg-danger'}`}>
                     {configured ? 'Configured' : 'Missing'}
                   </span>
                 </div>
@@ -65,30 +69,16 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="glass-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px' }}>
+        <div className={CARD}>
+          <h3 className="mb-3 text-base font-bold">
             Your Webhook Endpoint URL
           </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+          <p className="mb-4 text-[13px] text-ink-muted">
             Paste this URL into your Meta WhatsApp App Configuration:
           </p>
 
-          <div
-            style={{
-              background: 'var(--surface-2)',
-              padding: '12px 16px',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border)',
-              fontFamily: 'monospace',
-              fontSize: '13px',
-              color: 'var(--green-text)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '12px',
-            }}
-          >
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{webhookUrl}</span>
+          <div className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface-2 px-4 py-3 font-mono text-[13px] text-accent-fg">
+            <span className="overflow-hidden text-ellipsis">{webhookUrl}</span>
             <CopyButton
               text={webhookUrl}
               label={
@@ -103,37 +93,37 @@ export default function SettingsPage() {
                   Copied
                 </>
               }
-              className="btn btn-ghost btn-sm"
+              className="inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-[13px] font-semibold text-ink-muted transition-all duration-150 hover:bg-surface-2 hover:text-ink"
             />
           </div>
         </div>
 
-        <div className="glass-card" style={{ padding: '24px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className={CARD}>
+          <h3 className="mb-3 flex items-center gap-2 text-base font-bold">
             <HugeiconsIcon icon={BookOpen01Icon} size={18} strokeWidth={2} />
             How to Connect Your WhatsApp Number (Step-by-Step)
           </h3>
 
-          <ol style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingLeft: '20px', fontSize: '14px', color: 'var(--text-muted)' }}>
+          <ol className="flex flex-col gap-3 pl-5 text-sm text-ink-muted">
             <li>
-              <strong style={{ color: 'var(--text)' }}>Create a Meta App:</strong> Go to{' '}
-              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" style={{ color: 'var(--green-text)', textDecoration: 'underline' }}>
+              <strong className="text-ink">Create a Meta App:</strong> Go to{' '}
+              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="text-accent-fg underline">
                 developers.facebook.com
               </a>{' '}
               → Create App → Business Type → Add <strong>WhatsApp</strong> product.
             </li>
             <li>
-              <strong style={{ color: 'var(--text)' }}>Add Phone Number:</strong> In WhatsApp → API Setup, connect your
+              <strong className="text-ink">Add Phone Number:</strong> In WhatsApp → API Setup, connect your
               test or official WhatsApp Business number. Copy its Phone Number ID and permanent access
               token into your environment variables (not this page).
             </li>
             <li>
-              <strong style={{ color: 'var(--text)' }}>Configure Webhook:</strong> Go to WhatsApp → Configuration → Edit
-              Webhook. Enter the URL above and your <code style={{ color: 'var(--green-text)' }}>WHATSAPP_VERIFY_TOKEN</code>.
-              Subscribe to <code style={{ color: 'var(--green-text)' }}>messages</code> events.
+              <strong className="text-ink">Configure Webhook:</strong> Go to WhatsApp → Configuration → Edit
+              Webhook. Enter the URL above and your <code className="text-accent-fg">WHATSAPP_VERIFY_TOKEN</code>.
+              Subscribe to <code className="text-accent-fg">messages</code> events.
             </li>
             <li>
-              <strong style={{ color: 'var(--text)' }}>Test Your Survey:</strong> Send your WhatsApp link to any
+              <strong className="text-ink">Test Your Survey:</strong> Send your WhatsApp link to any
               student or phone number and watch responses flow into your dashboard live.
             </li>
           </ol>

@@ -9,6 +9,13 @@ import { Add01Icon, ClipboardIcon } from '@hugeicons/core-free-icons'
 
 const TABS = ['all', 'active', 'draft', 'closed'] as const
 
+const BTN_PRIMARY =
+  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-6 py-3 font-sans text-sm font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
+const BTN_PRIMARY_SM =
+  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-3.5 py-1.5 font-sans text-[13px] font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
+const CARD =
+  'rounded-lg border border-border bg-surface shadow-card transition-all hover:border-border-strong hover:shadow-hover'
+
 export default async function SurveysPage({
   searchParams,
 }: {
@@ -26,40 +33,29 @@ export default async function SurveysPage({
 
   return (
     <div className="animate-fade-up">
-      <div className="page-header">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="page-title">Surveys</h1>
-          <p className="page-subtitle">Create, deploy, and monitor your WhatsApp survey bots.</p>
+          <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">Surveys</h1>
+          <p className="mt-1 text-sm text-ink-muted">Create, deploy, and monitor your WhatsApp survey bots.</p>
         </div>
-        <Link href="/surveys/new" className="btn btn-primary">
+        <Link href="/surveys/new" className={BTN_PRIMARY}>
           <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.5} />
           New WhatsApp Survey
         </Link>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          marginBottom: '24px',
-          borderBottom: '1px solid var(--border)',
-          paddingBottom: '12px',
-        }}
-      >
+      <div className="mb-6 flex gap-2 border-b border-border pb-3">
         {TABS.map((tab) => {
           const isActive = status === tab
           return (
             <Link
               key={tab}
               href={tab === 'all' ? '/surveys' : `/surveys?status=${tab}`}
-              className="btn btn-ghost btn-sm"
-              style={{
-                textTransform: 'capitalize',
-                color: isActive ? 'var(--green-text)' : 'var(--text-muted)',
-                fontWeight: isActive ? 700 : 500,
-                background: isActive ? 'var(--green-tint)' : 'transparent',
-                border: isActive ? '1px solid var(--green-tint-border)' : '1px solid transparent',
-              }}
+              className={`inline-flex items-center gap-2 whitespace-nowrap rounded-md border px-3.5 py-1.5 font-sans text-[13px] capitalize transition-all duration-150 ${
+                isActive
+                  ? 'border-accent-line bg-accent-tint font-bold text-accent-fg'
+                  : 'border-transparent bg-transparent font-medium text-ink-muted hover:bg-surface-2 hover:text-ink'
+              }`}
             >
               {tab} {tab === 'all' ? `(${allSurveys.length})` : ''}
             </Link>
@@ -68,88 +64,75 @@ export default async function SurveysPage({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-state-icon" style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="flex flex-col items-center justify-center gap-4 px-5 py-20 text-center">
+          <div className="flex justify-center opacity-35">
             <HugeiconsIcon icon={ClipboardIcon} size={40} strokeWidth={1.5} />
           </div>
-          <div className="empty-state-title">
+          <div className="font-display text-xl font-bold text-ink">
             {allSurveys.length === 0 ? 'No surveys yet' : `No ${status} surveys`}
           </div>
-          <div className="empty-state-desc">
+          <div className="max-w-[320px] text-sm text-ink-muted">
             {allSurveys.length === 0
               ? 'Create your first WhatsApp survey to start collecting responses.'
               : 'Try a different filter, or create a new survey.'}
           </div>
-          <Link href="/surveys/new" className="btn btn-primary btn-sm" style={{ marginTop: '8px' }}>
+          <Link href="/surveys/new" className={`${BTN_PRIMARY_SM} mt-2`}>
             <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.5} />
             New WhatsApp Survey
           </Link>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '20px' }}>
+        <div className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(360px,1fr))]">
           {filtered.map((survey) => (
-            <div key={survey.id} className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div key={survey.id} className={`${CARD} flex flex-col justify-between p-6`}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span className={`badge badge-${survey.status === 'active' ? 'active' : survey.status === 'closed' ? 'closed' : 'draft'}`}>
+                <div className="mb-3 flex items-center justify-between">
+                  <span className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold tracking-[0.02em] before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:content-[""] ${survey.status === 'active' ? 'bg-accent-tint text-accent-fg before:animate-pulse-dot before:bg-accent-deep' : survey.status === 'closed' ? 'bg-danger-tint text-danger-fg before:bg-danger' : 'bg-tag text-ink-muted before:bg-ink-muted'}`}>
                     {survey.status === 'active' ? 'Live' : survey.status}
                   </span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <span className="text-xs text-ink-muted">
                     Created {new Date(survey.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
 
-                <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '6px', color: 'var(--text)' }}>
+                <h3 className="mb-1.5 text-lg font-bold text-ink">
                   {survey.title}
                 </h3>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '20px', lineHeight: 1.5 }}>
+                <p className="mb-5 text-[13px] leading-[1.5] text-ink-muted">
                   {survey.description || 'No description'}
                 </p>
               </div>
 
               <div>
-                <div
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '8px',
-                    padding: '12px',
-                    background: 'var(--tag-bg)',
-                    borderRadius: 'var(--radius-md)',
-                    marginBottom: '20px',
-                    textAlign: 'center',
-                  }}
-                >
+                <div className="mb-5 grid grid-cols-3 gap-2 rounded-md bg-tag p-3 text-center">
                   <div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Questions</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
+                    <div className="text-[11px] text-ink-muted">Questions</div>
+                    <div className="text-base font-bold text-ink">
                       {survey.questionsCount}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Responses</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--green-text)' }}>
+                    <div className="text-[11px] text-ink-muted">Responses</div>
+                    <div className="text-base font-bold text-accent-fg">
                       {survey.completed}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Completion</div>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
+                    <div className="text-[11px] text-ink-muted">Completion</div>
+                    <div className="text-base font-bold text-ink">
                       {survey.completionRate}%
                     </div>
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="flex gap-2">
                   <CopyButton
                     text={whatsAppLink(survey.id)}
-                    className="btn btn-secondary btn-sm"
-                    style={{ flex: 1, justifyContent: 'center' }}
+                    className="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-border-strong bg-surface px-3.5 py-1.5 font-sans text-[13px] font-semibold text-ink transition-all duration-150 hover:bg-surface-2"
                   />
                   <Link
                     href={`/surveys/${survey.id}`}
-                    className="btn btn-primary btn-sm"
-                    style={{ flex: 1, justifyContent: 'center' }}
+                    className={`${BTN_PRIMARY_SM} flex-1 justify-center`}
                   >
                     Analytics →
                   </Link>

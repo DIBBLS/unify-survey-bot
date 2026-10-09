@@ -39,42 +39,23 @@ export default function UpdatePasswordPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--bg)',
-        padding: '20px',
-      }}
-    >
-      <div
-        className="glass-card animate-fade-up"
-        style={{
-          width: '100%',
-          maxWidth: '420px',
-          padding: '36px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '24px',
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <div className="wordmark" style={{ fontSize: '32px', lineHeight: '32px', marginBottom: '12px' }}>
-            Unify<span className="dot">.</span>
+    <div className="flex min-h-screen items-center justify-center bg-canvas p-5">
+      <div className="flex w-full max-w-[420px] animate-fade-up flex-col gap-6 rounded-lg border border-border bg-surface p-9 shadow-card transition-all hover:border-border-strong hover:shadow-hover">
+        <div className="text-center">
+          <div className="mb-3 font-display text-[32px] font-black leading-8">
+            Unify<span className="text-accent">.</span>
           </div>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
+          <p className="mt-1 text-[13px] text-ink-muted">
             Choose a new password for your workspace
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div className="form-group">
-            <label className="form-label">New Password</label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">New Password</label>
             <input
               type="password"
-              className="form-input"
+              className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -83,11 +64,11 @@ export default function UpdatePasswordPage() {
             />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Confirm New Password</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted">Confirm New Password</label>
             <input
               type="password"
-              className="form-input"
+              className="w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus:shadow-[0_0_0_3px_var(--green-tint)] disabled:cursor-not-allowed disabled:opacity-50"
               placeholder="••••••••"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -97,12 +78,12 @@ export default function UpdatePasswordPage() {
           </div>
 
           {error && (
-            <div style={{ fontSize: '13px', color: 'var(--red)' }}>
+            <div className="text-[13px] text-danger-fg">
               {error}
               {error.toLowerCase().includes('session') && (
                 <>
                   {' '}
-                  <a href="/login" style={{ color: 'var(--green)', textDecoration: 'underline' }}>
+                  <a href="/login" className="text-accent underline">
                     Request a new reset link
                   </a>
                   .
@@ -113,8 +94,7 @@ export default function UpdatePasswordPage() {
 
           <button
             type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}
+            className="inline-flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-ink px-6 py-3 font-sans text-sm font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50 mt-2"
             disabled={loading}
           >
             {loading ? 'Updating…' : 'Update Password'}
