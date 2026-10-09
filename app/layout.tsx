@@ -1,5 +1,6 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import SmoothScroll from '@/components/smooth-scroll'
 
 export const metadata: Metadata = {
   title: 'Unify Survey Bot — WhatsApp Feedback Engine',
@@ -20,7 +21,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <SmoothScroll />
+        {children}
+      </body>
     </html>
   )
 }
