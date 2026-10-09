@@ -196,9 +196,25 @@ export function SidebarGroupLabel({ children }: { children: ReactNode }) {
   );
 }
 
-export function SidebarMenu({ children }: { children: ReactNode }) {
+export function SidebarMenu({
+  children,
+  onMouseLeave,
+  onBlur,
+}: {
+  children: ReactNode;
+  onMouseLeave?: () => void;
+  onBlur?: (e: React.FocusEvent) => void;
+}) {
   const { open } = useSidebar();
-  return <ul className={cn('flex flex-col', open ? 'gap-1' : 'gap-2')}>{children}</ul>;
+  return (
+    <ul
+      className={cn('flex flex-col', open ? 'gap-1' : 'gap-2')}
+      onMouseLeave={onMouseLeave}
+      onBlur={onBlur}
+    >
+      {children}
+    </ul>
+  );
 }
 
 export function SidebarMenuItem({ children }: { children: ReactNode }) {
