@@ -7,7 +7,7 @@ import CopyButton from '@/components/CopyButton'
 import PrintButton from '@/components/PrintButton'
 import SurveyEditPanel from '@/components/SurveyEditPanel'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Link01Icon, Tick01Icon } from '@hugeicons/core-free-icons'
+import { Link01Icon, Tick01Icon, Download01Icon } from '@hugeicons/core-free-icons'
 
 const BAR_COLORS = ['var(--green-deep)', 'var(--green)', 'var(--border-strong)', 'var(--text-subtle)']
 
@@ -51,6 +51,14 @@ export default async function SurveyResultsPage({ params }: { params: { id: stri
               </>
             }
           />
+          <a
+            href={`/api/surveys/${survey.id}/export`}
+            className="btn btn-secondary"
+            download
+          >
+            <HugeiconsIcon icon={Download01Icon} size={14} strokeWidth={2} />
+            Export CSV
+          </a>
           <PrintButton />
         </div>
       </div>
