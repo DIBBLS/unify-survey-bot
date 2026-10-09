@@ -13,8 +13,6 @@ import { formatDuration, whatsAppLink } from '@/lib/format'
 import CopyButton from '@/components/CopyButton'
 import { BarChart } from '@/components/charts/bar-chart'
 
-const BTN_PRIMARY =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-6 py-3 font-sans text-sm font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
 const BTN_PRIMARY_SM =
   'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-3.5 py-1.5 font-sans text-[13px] font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
 const BTN_SECONDARY_SM =
@@ -64,16 +62,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="animate-fade-up">
-      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">Dashboard</h1>
-        </div>
-        <Link href="/surveys/new" className={BTN_PRIMARY}>
-          <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.5} />
-          Create Survey
-        </Link>
-      </div>
-
       <div className="mb-6 grid grid-cols-2 overflow-hidden rounded-lg border border-border bg-surface shadow-card transition-all hover:border-border-strong hover:shadow-hover xl:grid-cols-4">
         <div className="min-w-0 border-border px-6 py-5 [&:not(:first-child)]:border-l max-xl:[&:nth-child(3)]:border-l-0 max-xl:[&:nth-child(n+3)]:border-t">
           <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">Completed Responses</div>
