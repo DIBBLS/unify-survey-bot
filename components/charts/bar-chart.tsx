@@ -121,7 +121,7 @@ function BarChart({
   data,
   labels,
   name,
-  color = 'var(--green)',
+  color = 'var(--primary)',
   orientation = 'vertical',
   radius = 4,
   showValues = false,
@@ -346,7 +346,7 @@ function BarChart({
         data-state={entrance}
         data-engaged={engaged ? '' : undefined}
         className={cn(
-          'relative w-full rounded-md outline-none [container-type:inline-size] focus-visible:shadow-[0_0_0_3px_var(--green-tint)]',
+          'relative w-full rounded-md outline-none [container-type:inline-size] focus-visible:ring-2 focus-visible:ring-ring',
           vertical ? 'aspect-[3/1] touch-pan-y' : 'touch-pan-x'
         )}
         style={vertical ? undefined : { height: ROW * bars.length }}

@@ -9,7 +9,7 @@ import SurveyEditPanel from '@/components/SurveyEditPanel'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Link01Icon, Tick01Icon, Download01Icon } from '@hugeicons/core-free-icons'
 
-const BAR_COLORS = ['var(--green-deep)', 'var(--green)', 'var(--border-strong)', 'var(--text-subtle)']
+const BAR_COLORS = ['var(--chart-2)', 'var(--chart-1)', 'var(--chart-3)', 'var(--chart-4)']
 
 const BTN_SECONDARY =
   'inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-border-strong bg-surface px-6 py-3 font-sans text-sm font-semibold text-ink transition-all duration-150 hover:bg-surface-2'
@@ -18,14 +18,15 @@ const CARD =
 const TH =
   'border-b border-border px-4 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-ink-muted'
 
-export default async function SurveyResultsPage({ params }: { params: { id: string } }) {
-  const supabase = createClient()
+export default async function SurveyResultsPage({ params }: { params: Promise<{ id: string }> }) {
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const survey = await getSurveyDetail(supabase, user.id, params.id)
+  const { id } = await params
+  const survey = await getSurveyDetail(supabase, user.id, id)
   if (!survey) notFound()
 
   return (
