@@ -41,7 +41,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function DashboardPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -64,13 +64,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="animate-fade-up">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">Dashboard</h1>
-          <p className="mt-1 text-sm text-ink-muted">
-            {responsesThisWeek} {responsesThisWeek === 1 ? 'response' : 'responses'} in the last
-            7 days across {surveys.length} survey{surveys.length === 1 ? '' : 's'}.
-          </p>
         </div>
         <Link href="/surveys/new" className={BTN_PRIMARY}>
           <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2.5} />

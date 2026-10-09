@@ -1,5 +1,5 @@
 const SHIMMER =
-  'animate-[shimmer_1.5s_infinite] rounded-md bg-[linear-gradient(90deg,var(--surface-2)_25%,var(--border)_50%,var(--surface-2)_75%)] bg-[length:200%_100%]'
+  'animate-[shimmer_1.5s_infinite] rounded-md bg-[linear-gradient(90deg,var(--muted)_25%,var(--border)_50%,var(--muted)_75%)] bg-[length:200%_100%]'
 
 export default function DashboardLoading() {
   return (
