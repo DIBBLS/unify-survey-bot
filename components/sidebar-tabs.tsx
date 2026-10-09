@@ -109,7 +109,9 @@ function UserMenu({ userEmail }: { userEmail: string | null }) {
         <DropdownMenuPrimitive.Root>
           <DropdownMenuPrimitive.Trigger asChild>
             <SidebarMenuButton className="h-12">
-              <AvatarPrimitive.Root className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sidebar-accent">
+              <AvatarPrimitive.Root
+                className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sidebar-accent ${open ? 'h-8 w-8' : 'h-10 w-10'}`}
+              >
                 <AvatarPrimitive.Fallback className="text-xs font-bold text-sidebar-accent-foreground">
                   {initials}
                 </AvatarPrimitive.Fallback>
@@ -251,7 +253,13 @@ function Shell({
                     onMouseEnter={() => router.prefetch(item.href)}
                     onFocus={() => router.prefetch(item.href)}
                   >
-                    <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
+                    {open ? (
+                      <HugeiconsIcon icon={item.icon} size={20} strokeWidth={1.8} />
+                    ) : (
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-accent">
+                        <HugeiconsIcon icon={item.icon} size={22} strokeWidth={1.8} />
+                      </span>
+                    )}
                     {open && <span>{item.label}</span>}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -269,7 +277,13 @@ function Shell({
                       onMouseEnter={() => router.prefetch('/surveys')}
                       onFocus={() => router.prefetch('/surveys')}
                     >
-                      <HugeiconsIcon icon={ClipboardIcon} size={20} strokeWidth={1.8} />
+                      {open ? (
+                        <HugeiconsIcon icon={ClipboardIcon} size={20} strokeWidth={1.8} />
+                      ) : (
+                        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-sidebar-accent">
+                          <HugeiconsIcon icon={ClipboardIcon} size={22} strokeWidth={1.8} />
+                        </span>
+                      )}
                       {open && <span>Surveys</span>}
                       {open && (
                         <span className="ml-auto transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90">
@@ -322,7 +336,7 @@ function Shell({
       </Sidebar>
 
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 bg-sidebar px-4">
+        <header className="flex h-16 shrink-0 items-center gap-2 bg-background px-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -341,13 +355,13 @@ function Shell({
                 ))}
             </Breadcrumb>
           </div>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-3 pr-1">
             {pathname !== '/surveys/new' && (
               <Link
                 href="/surveys/new"
-                className="inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-3.5 py-1.5 font-sans text-[13px] font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82]"
+                className="inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85]"
               >
-                <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.5} />
+                <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2} />
                 <span className="hidden sm:inline">Create Survey</span>
               </Link>
             )}
@@ -355,8 +369,8 @@ function Shell({
           </div>
         </header>
 
-        <main className="min-h-0 flex-1 overflow-hidden bg-sidebar p-0 md:pb-3 md:pr-3">
-          <div className="h-full overflow-auto bg-canvas md:rounded-3xl">
+        <main className="min-h-0 flex-1 overflow-y-auto bg-background [scrollbar-gutter:stable]">
+          <div className="bg-background px-6 pb-6 md:rounded-lg">
             <div className="min-h-full">{children}</div>
           </div>
         </main>

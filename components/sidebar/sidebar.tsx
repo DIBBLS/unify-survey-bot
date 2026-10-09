@@ -114,7 +114,7 @@ export function Sidebar({ children }: { children: ReactNode }) {
       animate={{ width: open ? SIDEBAR_WIDTH : SIDEBAR_WIDTH_ICON }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       data-collapsible={open ? undefined : 'icon'}
-      className="hidden shrink-0 flex-col overflow-hidden bg-sidebar md:flex"
+      className="hidden shrink-0 flex-col overflow-hidden bg-background md:flex"
     >
       <div className="flex h-full flex-col overflow-hidden">{children}</div>
     </motion.aside>
@@ -178,7 +178,12 @@ export function SidebarTrigger({ className = '' }: { className?: string }) {
 }
 
 export function SidebarGroup({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-1 px-3">{children}</div>;
+  const { open } = useSidebar();
+  return (
+    <div className={cn('flex flex-col', open ? 'gap-1 px-3' : 'gap-2 px-2')}>
+      {children}
+    </div>
+  );
 }
 
 export function SidebarGroupLabel({ children }: { children: ReactNode }) {
@@ -192,7 +197,8 @@ export function SidebarGroupLabel({ children }: { children: ReactNode }) {
 }
 
 export function SidebarMenu({ children }: { children: ReactNode }) {
-  return <ul className="flex flex-col gap-1">{children}</ul>;
+  const { open } = useSidebar();
+  return <ul className={cn('flex flex-col', open ? 'gap-1' : 'gap-2')}>{children}</ul>;
 }
 
 export function SidebarMenuItem({ children }: { children: ReactNode }) {
@@ -200,7 +206,7 @@ export function SidebarMenuItem({ children }: { children: ReactNode }) {
 }
 
 const MENU_BUTTON =
-  'flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150';
+  'flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm font-medium transition-colors duration-150 focus-visible:outline-1 focus-visible:outline-ring';
 
 export function SidebarMenuButton({
   children,
@@ -226,15 +232,19 @@ export function SidebarMenuButton({
       onMouseEnter={onMouseEnter}
       onFocus={onFocus}
       aria-current={isActive ? 'page' : undefined}
+      aria-label={!open && tooltip ? tooltip : undefined}
       className={cn(
         MENU_BUTTON,
         isActive
-          ? 'bg-sidebar-accent font-semibold text-sidebar-accent-foreground'
-          : 'font-medium text-sidebar-foreground hover:bg-[color-mix(in_srgb,var(--sidebar-accent)55%,var(--sidebar-foreground))] hover:text-sidebar-accent-foreground',
-        !open && 'justify-center px-0',
+          ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
+          : 'font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+        !open && 'mx-auto h-10 w-10 justify-center p-0',
         className
       )}
     >
+      {open && isActive && (
+        <span aria-hidden="true" className="h-[6px] w-[6px] shrink-0 rounded-full bg-primary" />
+      )}
       {children}
     </button>
   );
