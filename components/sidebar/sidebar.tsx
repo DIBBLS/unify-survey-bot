@@ -292,7 +292,8 @@ export function SidebarMenuButton({
         <TooltipPrimitive.Portal>
           <TooltipPrimitive.Content
             side="right"
-            className="z-50 overflow-hidden rounded-md border border-border bg-surface px-3 py-1.5 text-[13px] font-medium text-ink shadow-card"
+            sideOffset={8}
+            className="z-50 rounded-md border border-border bg-popover px-2 py-1 text-xs text-popover-foreground"
           >
             {tooltip}
           </TooltipPrimitive.Content>
@@ -333,7 +334,7 @@ export function SidebarMenuSubButton({
         'flex w-full items-center gap-2 overflow-hidden rounded-md px-2 py-1.5 text-left text-[13px] transition-colors duration-150',
         isActive
           ? 'font-semibold text-sidebar-accent-foreground'
-          : 'text-sidebar-foreground hover:bg-[color-mix(in_srgb,var(--sidebar-accent)55%,var(--sidebar-foreground))] hover:text-sidebar-accent-foreground'
+          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
       )}
     >
       {children}
