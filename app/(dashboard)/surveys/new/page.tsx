@@ -9,6 +9,7 @@ import {
   Add01Icon,
   ArrowDown01Icon,
   Cancel01Icon,
+  Delete01Icon,
   Delete02Icon,
   WavingHand01Icon,
   StarIcon,
@@ -24,19 +25,19 @@ interface DraftQuestion {
 }
 
 const BTN_PRIMARY =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-6 py-3 font-sans text-sm font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
+  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85] disabled:cursor-default disabled:opacity-50'
 const BTN_SECONDARY_SM =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-border-strong bg-surface px-3.5 py-1.5 font-sans text-[13px] font-semibold text-ink transition-all duration-150 hover:bg-surface-2'
-const BTN_DANGER =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-danger/20 bg-danger-tint px-6 py-3 font-sans text-sm font-semibold text-danger-fg transition-all duration-150 hover:bg-danger/[0.14] disabled:cursor-default disabled:opacity-50'
-const BTN_DANGER_SM =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-danger/20 bg-danger-tint px-3.5 py-1.5 font-sans text-[13px] font-semibold text-danger-fg transition-all duration-150 hover:bg-danger/[0.14] disabled:cursor-default disabled:opacity-50'
+  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-transparent px-3.5 font-sans text-[13px] font-medium text-foreground transition-all duration-150 hover:bg-muted'
+const BTN_DESTRUCTIVE =
+  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md bg-destructive-soft px-3.5 font-sans text-[13px] font-medium text-destructive transition-all duration-150 hover:opacity-[0.85] disabled:cursor-default disabled:opacity-50'
 const BTN_GHOST_SM =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-[13px] font-semibold text-ink-muted transition-all duration-150 hover:bg-surface-2 hover:text-ink'
-const CARD = 'rounded-lg border border-border bg-surface p-6 shadow-card'
+  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 font-sans text-[13px] font-medium text-muted-foreground transition-all duration-150 hover:bg-muted hover:text-foreground'
+const CARD = 'rounded-lg border border-border bg-card p-6 text-card-foreground'
 const INPUT =
-  'w-full rounded-md border border-border-strong bg-surface-2 px-4 py-3 font-sans text-sm text-ink outline-none transition-all placeholder:text-ink-subtle focus:border-ink focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
-const LABEL = 'text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-muted'
+  'h-9 w-full rounded-md border border-input bg-transparent px-3.5 font-sans text-sm text-foreground transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+const TEXTAREA =
+  'min-h-[5.5rem] w-full rounded-md border border-input bg-transparent px-3.5 py-2.5 font-sans text-sm text-foreground transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 resize-y'
+const LABEL = 'text-[13px] font-medium text-muted-foreground'
 
 export default function NewSurveyPage() {
   const router = useRouter()
@@ -151,10 +152,10 @@ export default function NewSurveyPage() {
       {/* Header */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <Link href="/surveys" className="mb-1 inline-block text-[13px] text-ink-muted">
+          <Link href="/surveys" className="mb-1 inline-block text-[13px] text-muted-foreground">
             ← Back to Surveys
           </Link>
-          <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">Create WhatsApp Survey</h1>
+          <h1 className="text-[32px] font-bold leading-none tracking-[-0.01em] text-foreground">Create WhatsApp Survey</h1>
         </div>
         <div className="flex flex-col items-end gap-2">
           <div className="flex gap-3">
@@ -163,13 +164,13 @@ export default function NewSurveyPage() {
                 <button onClick={() => setConfirmingDelete(false)} className={BTN_GHOST_SM} disabled={publishing}>
                   Keep
                 </button>
-                <button onClick={() => router.push('/surveys')} className={BTN_DANGER} disabled={publishing}>
+                <button onClick={() => router.push('/surveys')} className={BTN_DESTRUCTIVE} disabled={publishing}>
                   <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={2} />
                   Confirm delete
                 </button>
               </>
             ) : (
-              <button onClick={() => setConfirmingDelete(true)} className={BTN_DANGER} disabled={publishing}>
+              <button onClick={() => setConfirmingDelete(true)} className={BTN_DESTRUCTIVE} disabled={publishing}>
                 <HugeiconsIcon icon={Delete02Icon} size={16} strokeWidth={2} />
                 Delete
               </button>
@@ -186,7 +187,7 @@ export default function NewSurveyPage() {
             </button>
           </div>
           {publishError && (
-            <div className="text-[13px] text-danger">{publishError}</div>
+            <div className="text-[13px] text-destructive">{publishError}</div>
           )}
         </div>
       </div>
@@ -197,12 +198,12 @@ export default function NewSurveyPage() {
         <div className="flex flex-col gap-6">
           {/* Survey Details Card */}
           <div className={CARD}>
-            <h3 className="mb-4 text-base font-bold">
-              Survey Details
+            <h3 className="mb-4 text-[15px] font-semibold text-foreground">
+              Survey details
             </h3>
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className={LABEL}>Survey Title</label>
+                <label className={LABEL}>Survey title</label>
                 <input
                   type="text"
                   className={INPUT}
@@ -213,9 +214,9 @@ export default function NewSurveyPage() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className={LABEL}>Description / Greeting Message</label>
+                <label className={LABEL}>Description / greeting message</label>
                 <textarea
-                  className={`${INPUT} min-h-[100px] resize-y`}
+                  className={TEXTAREA}
                   placeholder="e.g. We are trying to understand what makes school difficult. Takes 2 minutes!"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -227,7 +228,7 @@ export default function NewSurveyPage() {
           {/* Questions Section */}
           <div className={CARD}>
             <div className="mb-5 flex items-center justify-between">
-              <h3 className="text-base font-bold">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 Questions ({questions.length})
               </h3>
               <button onClick={addQuestion} className={BTN_SECONDARY_SM}>
@@ -242,10 +243,10 @@ export default function NewSurveyPage() {
                 <button
                   key={q.id}
                   onClick={() => setActiveQuestionIndex(idx)}
-                  className={`inline-flex items-center gap-2 whitespace-nowrap rounded-md border px-3.5 py-1.5 font-sans text-[13px] font-semibold transition-all duration-150 ${
+                  className={`inline-flex h-8 items-center gap-2 whitespace-nowrap rounded-md px-3.5 font-sans text-[13px] font-medium transition-colors duration-150 ${
                     activeQuestionIndex === idx
-                      ? 'border-accent-line bg-accent-tint text-accent-fg'
-                      : 'border-transparent bg-tag text-ink-muted hover:bg-surface-2 hover:text-ink'
+                      ? 'bg-primary-soft text-green-text'
+                      : 'bg-muted text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Q{idx + 1}
@@ -255,24 +256,24 @@ export default function NewSurveyPage() {
 
             {/* Active Question Editor */}
             {currentQ && (
-              <div className="rounded-md border border-border bg-surface-2 p-5">
+              <div className="rounded-md bg-muted-soft p-5">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="text-sm font-bold text-accent-fg">
+                  <span className="text-sm font-semibold text-green-text">
                     Question #{activeQuestionIndex + 1}
                   </span>
                   {questions.length > 1 && (
                     <button
                       onClick={() => removeQuestion(activeQuestionIndex)}
-                      className={BTN_DANGER_SM}
+                      className={BTN_DESTRUCTIVE}
                     >
-                      Delete Question
+                      Delete question
                     </button>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-1.5">
-                    <label className={LABEL}>Question Text</label>
+                    <label className={LABEL}>Question text</label>
                     <input
                       type="text"
                       className={INPUT}
@@ -283,7 +284,7 @@ export default function NewSurveyPage() {
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className={LABEL}>Response Type</label>
+                    <label className={LABEL}>Response type</label>
                     <div className="relative">
                       <select
                         className={`${INPUT} appearance-none pr-10`}
@@ -295,7 +296,7 @@ export default function NewSurveyPage() {
                         <option value="yes_no">Yes / No Poll</option>
                         <option value="text">Open Text Response</option>
                       </select>
-                      <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 flex -translate-y-1/2 text-ink-muted">
+                      <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 flex -translate-y-1/2 text-muted-foreground">
                         <HugeiconsIcon icon={ArrowDown01Icon} size={14} strokeWidth={2} />
                       </span>
                     </div>
@@ -303,26 +304,26 @@ export default function NewSurveyPage() {
 
                   {/* Options editor for Choice type */}
                   {currentQ.type === 'choice' && (
-                    <div className="mt-2 flex flex-col gap-2.5">
-                      <label className={LABEL}>Answer Options (Max 10)</label>
+                    <div className="mt-2 flex flex-col gap-3">
+                      <label className={LABEL}>Answer options (max 10)</label>
                       {currentQ.options.map((opt, oIdx) => (
-                        <div key={oIdx} className="flex gap-2">
-                          <span className="flex w-6 items-center text-[13px] text-ink-muted">
+                        <div key={oIdx} className="grid grid-cols-[20px_1fr_auto] items-center gap-3">
+                          <span className="flex w-5 items-center text-[13px] text-muted-foreground">
                             {String.fromCharCode(65 + oIdx)}
                           </span>
                           <input
                             type="text"
-                            className={`${INPUT} flex-1`}
+                            className={INPUT}
                             value={opt}
                             onChange={(e) => updateOption(activeQuestionIndex, oIdx, e.target.value)}
                           />
                           {currentQ.options.length > 2 && (
                             <button
                               onClick={() => removeOption(activeQuestionIndex, oIdx)}
-                              className="inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-[13px] font-semibold text-danger transition-all duration-150 hover:bg-surface-2"
-                              aria-label="Remove option"
+                              className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive-soft hover:text-destructive"
+                              aria-label="Delete option"
                             >
-                              <HugeiconsIcon icon={Cancel01Icon} size={14} strokeWidth={2} />
+                              <HugeiconsIcon icon={Delete01Icon} size={16} strokeWidth={1.5} color="currentColor" />
                             </button>
                           )}
                         </div>
@@ -330,9 +331,9 @@ export default function NewSurveyPage() {
                       {currentQ.options.length < 10 && (
                         <button
                           onClick={() => addOption(activeQuestionIndex)}
-                          className="inline-flex items-center gap-2 self-start whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-[13px] font-semibold text-accent transition-all duration-150 hover:bg-surface-2"
+                          className="inline-flex items-center gap-2 self-start whitespace-nowrap rounded-md bg-transparent px-3 py-2 font-sans text-[13px] font-medium text-green-text transition-colors hover:bg-muted"
                         >
-                          + Add Option
+                          + Add option
                         </button>
                       )}
                     </div>
