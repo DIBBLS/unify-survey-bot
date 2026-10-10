@@ -376,7 +376,7 @@ function Shell({
             {pathname !== '/surveys/new' && (
               <Link
                 href="/surveys/new"
-                className="inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85]"
+                className="inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85] focus-visible:border-ring focus-visible:outline-none"
               >
                 <HugeiconsIcon icon={Add01Icon} size={16} strokeWidth={2} />
                 <span className="hidden sm:inline">Create Survey</span>
@@ -387,7 +387,7 @@ function Shell({
         </header>
 
         <main className="min-h-0 flex-1 overflow-y-auto bg-background [scrollbar-gutter:stable]">
-          <div className="bg-background px-6 pb-6 md:rounded-lg">
+          <div className="bg-background px-6 pb-6 pt-6 md:rounded-lg">
             <div className="min-h-full">{children}</div>
           </div>
         </main>

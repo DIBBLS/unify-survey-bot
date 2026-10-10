@@ -38,7 +38,7 @@ export function BreadcrumbLink({
   children: ReactNode;
 }) {
   return (
-    <a href={href} className="transition-colors hover:text-ink">
+    <a href={href} className="rounded-sm transition-colors hover:text-ink focus-visible:underline focus-visible:outline-none">
       {children}
     </a>
   );

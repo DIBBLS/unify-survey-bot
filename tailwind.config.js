@@ -49,7 +49,10 @@ module.exports = {
           DEFAULT: 'var(--foreground)',
           // Row/hover tints: v3 can't do /opacity on var() colors.
           faint: 'color-mix(in srgb, var(--foreground) 4%, transparent)',
+          mist: 'color-mix(in srgb, var(--foreground) 6%, transparent)',
+          wash: 'color-mix(in srgb, var(--foreground) 7%, transparent)',
           soft: 'color-mix(in srgb, var(--foreground) 8%, transparent)',
+          line: 'color-mix(in srgb, var(--foreground) 25%, var(--border))',
         },
         card: {
           DEFAULT: 'var(--card)',
@@ -66,6 +69,7 @@ module.exports = {
           // translucent steps are pre-mixed tokens (bg-primary-soft etc.).
           soft: 'color-mix(in srgb, var(--primary) 15%, transparent)',
           tile: 'color-mix(in srgb, var(--primary) 14%, transparent)',
+          deep: 'color-mix(in srgb, var(--primary) 18%, transparent)',
         },
         secondary: {
           DEFAULT: 'var(--secondary)',
@@ -80,6 +84,8 @@ module.exports = {
           DEFAULT: 'var(--destructive)',
           foreground: 'var(--destructive-foreground)',
           soft: 'color-mix(in srgb, var(--destructive) 10%, transparent)',
+          faint: 'color-mix(in srgb, var(--destructive) 12%, transparent)',
+          tint: 'color-mix(in srgb, var(--destructive) 14%, transparent)',
         },
         warning: {
           DEFAULT: 'var(--warning)',
