@@ -3,16 +3,32 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase-server'
 import { getSurveysWithStats } from '@/lib/queries'
 import { whatsAppLink } from '@/lib/format'
-import CopyButton from '@/components/CopyButton'
+import { CopyLinkButton } from '@/components/survey-cells'
+import { FilterTabs } from '@/components/filter-tabs'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Add01Icon, ClipboardIcon } from '@hugeicons/core-free-icons'
+import { ArrowRight01Icon } from '@hugeicons/core-free-icons'
 
-const TABS = ['all', 'active', 'draft', 'closed'] as const
-
-const BTN_PRIMARY_SM =
-  'inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-ink px-3.5 py-1.5 font-sans text-[13px] font-semibold text-canvas transition-all duration-150 hover:opacity-[0.82] disabled:cursor-default disabled:opacity-50'
-const CARD =
-  'rounded-lg border border-border bg-surface shadow-card transition-all hover:border-border-strong hover:shadow-hover'
+function StatusPill({ status }: { status: string }) {
+  if (status === 'active') {
+    return (
+      <span className="inline-flex rounded-full bg-primary-soft px-2 py-0.5 text-xs font-medium text-green-text">
+        Live
+      </span>
+    )
+  }
+  if (status === 'draft') {
+    return (
+      <span className="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+        Draft
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex rounded-full bg-foreground-soft px-2 py-0.5 text-xs font-medium text-muted-foreground">
+      Closed
+    </span>
+  )
+}
 
 export default async function SurveysPage({
   searchParams,
@@ -29,107 +45,112 @@ export default async function SurveysPage({
   const status = statusParam ?? 'all'
   const allSurveys = await getSurveysWithStats(supabase, user.id)
   const filtered = status === 'all' ? allSurveys : allSurveys.filter((s) => s.status === status)
+  const counts: Record<string, number> = {
+    all: allSurveys.length,
+    active: allSurveys.filter((s) => s.status === 'active').length,
+    draft: allSurveys.filter((s) => s.status === 'draft').length,
+    closed: allSurveys.filter((s) => s.status === 'closed').length,
+  }
+  const statusLabel = status.charAt(0).toUpperCase() + status.slice(1)
 
   return (
     <div className="animate-fade-up">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">Surveys</h1>
-          <p className="mt-1 text-sm text-ink-muted">Create, deploy, and monitor your WhatsApp survey bots.</p>
+          <h1 className="text-[22px] font-semibold tracking-tight text-foreground">Surveys</h1>
+          <p className="mt-1 text-[13px] text-muted-foreground">Create, deploy, and monitor your WhatsApp survey bots.</p>
         </div>
       </div>
 
-      <div className="mb-6 flex gap-2 border-b border-border pb-3">
-        {TABS.map((tab) => {
-          const isActive = status === tab
-          return (
-            <Link
-              key={tab}
-              href={tab === 'all' ? '/surveys' : `/surveys?status=${tab}`}
-              className={`inline-flex items-center gap-2 whitespace-nowrap rounded-md border px-3.5 py-1.5 font-sans text-[13px] capitalize transition-all duration-150 ${
-                isActive
-                  ? 'border-accent-line bg-accent-tint font-bold text-accent-fg'
-                  : 'border-transparent bg-transparent font-medium text-ink-muted hover:bg-surface-2 hover:text-ink'
-              }`}
-            >
-              {tab} {tab === 'all' ? `(${allSurveys.length})` : ''}
-            </Link>
-          )
-        })}
-      </div>
+      <FilterTabs counts={counts} active={status} />
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 px-5 py-20 text-center">
-          <div className="flex justify-center opacity-35">
-            <HugeiconsIcon icon={ClipboardIcon} size={40} strokeWidth={1.5} />
+        allSurveys.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-16 text-center">
+            <p className="text-sm font-medium text-foreground">No surveys yet</p>
+            <Link
+              href="/surveys/new"
+              className="inline-flex h-9 items-center whitespace-nowrap rounded-md border border-transparent bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85] focus-visible:border-ring focus-visible:outline-none"
+            >
+              Create survey
+            </Link>
           </div>
-          <div className="font-display text-xl font-bold text-ink">
-            {allSurveys.length === 0 ? 'No surveys yet' : `No ${status} surveys`}
+        ) : (
+          <div className="flex flex-col items-center gap-1 py-16 text-center">
+            <p className="text-sm font-medium text-foreground">No {status} surveys</p>
+            <p className="text-[13px] text-muted-foreground">
+              {status === 'draft'
+                ? 'Surveys you save as drafts will show up here.'
+                : `${statusLabel} surveys will show up here.`}
+            </p>
           </div>
-          <div className="max-w-[320px] text-sm text-ink-muted">
-            {allSurveys.length === 0
-              ? 'Create your first WhatsApp survey to start collecting responses.'
-              : 'Try a different filter, or create a new survey.'}
-          </div>
-          <Link href="/surveys/new" className={`${BTN_PRIMARY_SM} mt-2`}>
-            <HugeiconsIcon icon={Add01Icon} size={14} strokeWidth={2.5} />
-            New WhatsApp Survey
-          </Link>
-        </div>
+        )
       ) : (
-        <div className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(360px,1fr))]">
+        <div className="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
           {filtered.map((survey) => (
-            <div key={survey.id} className={`${CARD} flex flex-col justify-between p-6`}>
-              <div>
-                <div className="mb-3 flex items-center justify-between">
-                  <span className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold tracking-[0.02em] before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:content-[""] ${survey.status === 'active' ? 'bg-accent-tint text-accent-fg before:animate-pulse-dot before:bg-accent-deep' : survey.status === 'closed' ? 'bg-danger-tint text-danger-fg before:bg-danger' : 'bg-tag text-ink-muted before:bg-ink-muted'}`}>
-                    {survey.status === 'active' ? 'Live' : survey.status}
-                  </span>
-                  <span className="text-xs text-ink-muted">
-                    Created {new Date(survey.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
+            <div
+              key={survey.id}
+              className="flex flex-col gap-4 rounded-lg border border-border bg-card p-6 text-card-foreground motion-safe:transition-colors motion-safe:duration-[120ms] hover:border-foreground-line"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="break-words text-base font-semibold text-foreground">
+                    <Link
+                      href={`/surveys/${survey.id}`}
+                      className="transition-colors hover:text-green-text focus-visible:underline focus-visible:outline-none"
+                    >
+                      {survey.title}
+                    </Link>
+                  </h3>
+                  {survey.description && (
+                    <p className="mt-0.5 line-clamp-2 text-[13px] text-muted-foreground">
+                      {survey.description}
+                    </p>
+                  )}
                 </div>
-
-                <h3 className="mb-1.5 text-lg font-bold text-ink">
-                  {survey.title}
-                </h3>
-                <p className="mb-5 text-[13px] leading-[1.5] text-ink-muted">
-                  {survey.description || 'No description'}
-                </p>
+                <div className="shrink-0">
+                  <StatusPill status={survey.status} />
+                </div>
               </div>
 
-              <div>
-                <div className="mb-5 grid grid-cols-3 gap-2 rounded-md bg-tag p-3 text-center">
-                  <div>
-                    <div className="text-[11px] text-ink-muted">Questions</div>
-                    <div className="text-base font-bold text-ink">
-                      {survey.questionsCount}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[11px] text-ink-muted">Responses</div>
-                    <div className="text-base font-bold text-accent-fg">
-                      {survey.completed}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[11px] text-ink-muted">Completion</div>
-                    <div className="text-base font-bold text-ink">
-                      {survey.completionRate}%
-                    </div>
+              <div className="grid grid-cols-3 gap-2 border-t border-border pt-4">
+                <div>
+                  <div className="text-xs text-muted-foreground">Questions</div>
+                  <div className="text-lg font-semibold tabular-nums text-foreground">
+                    {survey.questionsCount}
                   </div>
                 </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Responses</div>
+                  <div className="text-lg font-semibold tabular-nums text-foreground">
+                    {survey.completed}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Completion</div>
+                  <div className="text-lg font-semibold tabular-nums text-foreground">
+                    {survey.completionRate}%
+                  </div>
+                </div>
+              </div>
 
-                <div className="flex gap-2">
-                  <CopyButton
-                    text={whatsAppLink(survey.id)}
-                    className="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-border-strong bg-surface px-3.5 py-1.5 font-sans text-[13px] font-semibold text-ink transition-all duration-150 hover:bg-surface-2"
-                  />
+              <div className="mt-auto flex items-center justify-between gap-2">
+                <span className="truncate text-xs text-muted-foreground">
+                  Created {new Date(survey.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+                <div className="flex shrink-0 items-center gap-2">
+                  <CopyLinkButton text={whatsAppLink(survey.id)} />
                   <Link
                     href={`/surveys/${survey.id}`}
-                    className={`${BTN_PRIMARY_SM} flex-1 justify-center`}
+                    className="inline-flex h-9 items-center gap-1 whitespace-nowrap rounded-md border border-border bg-transparent px-3.5 font-sans text-[13px] font-medium text-foreground transition-colors hover:bg-muted motion-safe:transition-colors focus-visible:border-ring focus-visible:outline-none"
                   >
-                    Analytics →
+                    Analytics
+                    <HugeiconsIcon
+                      icon={ArrowRight01Icon}
+                      size={14}
+                      strokeWidth={1.5}
+                      color="currentColor"
+                    />
                   </Link>
                 </div>
               </div>
