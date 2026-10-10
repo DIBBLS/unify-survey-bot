@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { PencilEdit02Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
+import { Edit02Icon, ArrowDown01Icon } from '@hugeicons/core-free-icons'
 
 const BTN = 'inline-flex items-center gap-2 whitespace-nowrap rounded-md font-sans font-semibold transition-all duration-150'
 const BTN_SM = 'px-3.5 py-1.5 text-[13px]'
@@ -66,17 +66,24 @@ export default function SurveyEditPanel({
   if (!editing) {
     return (
       <div>
-        <div className="flex items-center gap-3">
-          <h1 className="font-display text-[32px] font-black leading-none tracking-[-1px] text-ink">{initialTitle}</h1>
-          <span className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-xs font-semibold tracking-[0.02em] before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:content-[""] ${initialStatus === 'active' ? 'bg-accent-tint text-accent-fg before:bg-accent-deep before:animate-pulse-dot' : initialStatus === 'closed' ? 'bg-danger-tint text-danger-fg before:bg-danger' : 'bg-tag text-ink-muted before:bg-ink-muted'}`}>
-            {initialStatus === 'active' ? 'Live Bot' : initialStatus}
-          </span>
-          <button onClick={startEdit} className={`${BTN} ${BTN_SM} bg-transparent px-3 py-2 text-ink-muted hover:bg-surface-2 hover:text-ink`}>
-            <HugeiconsIcon icon={PencilEdit02Icon} size={14} strokeWidth={2} />
+        <div className="flex flex-wrap items-center gap-2">
+          <h1 className="break-words text-[22px] font-semibold tracking-tight text-foreground">{initialTitle}</h1>
+          {initialStatus !== 'active' && (
+            <span className="inline-flex shrink-0 rounded-full bg-foreground-soft px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              {initialStatus.charAt(0).toUpperCase() + initialStatus.slice(1)}
+            </span>
+          )}
+          <button
+            onClick={startEdit}
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-transparent bg-transparent px-2.5 font-sans text-[13px] font-medium text-muted-foreground transition-colors hover:bg-foreground-soft hover:text-foreground focus-visible:border-ring focus-visible:outline-none"
+          >
+            <HugeiconsIcon icon={Edit02Icon} size={14} strokeWidth={1.5} color="currentColor" />
             Edit
           </button>
         </div>
-        <p className="mt-1 text-sm text-ink-muted">{initialDescription || 'No description'}</p>
+        {initialDescription && (
+          <p className="mt-1 text-[13px] text-muted-foreground">{initialDescription}</p>
+        )}
       </div>
     )
   }
