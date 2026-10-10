@@ -21,7 +21,7 @@ import { CopyLinkButton, CompletionBar } from '@/components/survey-cells'
 import { ActivityChart } from '@/components/charts/activity-chart'
 
 const BTN_PRIMARY_SM =
-  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85] disabled:cursor-default disabled:opacity-50'
+  'inline-flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-transparent bg-primary px-3.5 font-sans text-[13px] font-medium text-primary-foreground transition-all duration-150 hover:opacity-[0.85] disabled:cursor-default disabled:opacity-50'
 const CARD = 'rounded-lg border border-border bg-card p-6 text-card-foreground'
 
 const SURVEY_ROW_GRID =
@@ -145,10 +145,6 @@ export default async function DashboardPage() {
                 Completed responses over the last 7 days
               </p>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-tile px-2 py-0.5 text-[12px] font-medium text-green-text">
-              <span aria-hidden="true" className="h-[6px] w-[6px] rounded-full bg-primary" />
-              Live
-            </span>
           </div>
 
           <ActivityChart data={activity} />
@@ -188,9 +184,9 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                   <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium ${r.completed ? 'bg-primary-tile text-green-text' : 'bg-warning-soft text-warning-ink'}`}
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-medium ${r.completed ? 'bg-primary-tile text-green-text' : 'bg-destructive-tint text-destructive'}`}
                   >
-                    {r.completed ? 'Done' : 'Partial'}
+                    {r.completed ? 'Done' : 'Abandoned'}
                   </span>
                 </div>
               ))}
