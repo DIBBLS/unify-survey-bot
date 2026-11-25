@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { extractMessageText, extractPhoneNumber, extractMessageId, extractMessageKind } from '@/lib/whatsapp'
+import { extractMessageText, extractPhoneNumber, extractMessageId, extractMessageKind, extractAudioMediaId } from '@/lib/whatsapp'
 import { handleIncomingMessage } from '@/lib/survey-engine'
 
 function isValidSignature(rawBody: string, signatureHeader: string | null): boolean {
@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
     const messageText = extractMessageText(body)
     const messageId = extractMessageId(body)
     const kind = extractMessageKind(body)
+    const audioMediaId = extractAudioMediaId(body)
 
     if (phoneNumber && (messageText || kind === 'media')) {
       console.log(`Incoming message from ${phoneNumber}: "${messageText ?? `<${kind}>`}"`)
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Process message through Survey Engine
-      await handleIncomingMessage(phoneNumber, messageText, surveyId, messageId, kind)
+      await handleIncomingMessage(phoneNumber, messageText, surveyId, messageId, kind, audioMediaId)
     } else {
       // Meta also posts delivery/read receipts and other non-message
       // events to this same webhook — this is expected for those. If

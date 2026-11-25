@@ -172,3 +172,7 @@ create policy "Owners view answers on their responses" on public.answers
 -- Bot correctness work: respondent opt-out state on sessions.
 alter table public.sessions
   add column if not exists opted_out_at timestamp with time zone;
+
+-- Voice-note answers (migration): flags answers that came from a transcribed
+-- WhatsApp voice note rather than typed text.
+alter table public.answers add column if not exists is_voice boolean not null default false;

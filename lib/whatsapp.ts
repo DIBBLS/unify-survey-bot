@@ -134,3 +134,50 @@ export function extractMessageKind(body: any): InboundKind {
     return 'unknown'
   }
 }
+
+// Media id of an inbound audio / voice-note message, or null.
+export function extractAudioMediaId(body: any): string | null {
+  try {
+    const msg = body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0]
+    if (msg?.type !== 'audio') return null
+    return msg.audio?.id ?? null
+  } catch {
+    return null
+  }
+}
+
+// ~3 minutes of WhatsApp Opus audio. Longer notes are refused rather than
+// paid for — answers shouldn't need more.
+export const MAX_VOICE_NOTE_BYTES = 3 * 1024 * 1024
+
+// Downloads inbound media from the Cloud API: first resolve the media id to a
+// short-lived URL, then fetch the bytes (both calls need the access token).
+export async function downloadMedia(
+  mediaId: string
+): Promise<{ data: ArrayBuffer; mimeType: string; tooLarge?: boolean } | null> {
+  try {
+    const metaRes = await fetch(`${WHATSAPP_API_URL}/${mediaId}`, {
+      headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
+    })
+    const meta = await metaRes.json()
+    if (!metaRes.ok || !meta?.url) {
+      console.error(`Media lookup failed (HTTP ${metaRes.status}):`, JSON.stringify(meta))
+      return null
+    }
+    const mimeType: string = meta.mime_type || 'audio/ogg'
+    if (typeof meta.file_size === 'number' && meta.file_size > MAX_VOICE_NOTE_BYTES) {
+      return { data: new ArrayBuffer(0), mimeType, tooLarge: true }
+    }
+    const fileRes = await fetch(meta.url, {
+      headers: { Authorization: `Bearer ${ACCESS_TOKEN}` },
+    })
+    if (!fileRes.ok) {
+      console.error(`Media download failed (HTTP ${fileRes.status})`)
+      return null
+    }
+    return { data: await fileRes.arrayBuffer(), mimeType }
+  } catch (err) {
+    console.error('Media download error:', err)
+    return null
+  }
+}

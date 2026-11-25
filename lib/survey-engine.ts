@@ -4,7 +4,9 @@ import {
   sendButtonMessage,
   sendListMessage,
   type InboundKind,
+  downloadMedia,
 } from './whatsapp'
+import { transcribeAudio, isTranscriptionEnabled } from './transcribe'
 
 function getSupabase() {
   return createClient(
@@ -210,7 +212,8 @@ export async function handleIncomingMessage(
   messageText: string | null,
   surveyId?: string,
   messageId?: string | null,
-  kind: InboundKind = 'text'
+  kind: InboundKind = 'text',
+  audioMediaId: string | null = null
 ) {
   const supabase = getSupabase()
 
@@ -248,6 +251,40 @@ export async function handleIncomingMessage(
     const optedOutSession =
       session && session.opted_out_at ? session : null
 
+    // Voice note on an open-ended (text) question: transcribe it and treat
+    // the transcript as a typed answer. Closed questions (yes/no, choice,
+    // rating) keep their buttons — guessing a pick from speech is error-prone.
+    let isVoiceAnswer = false
+    if (audioMediaId && activeSession && !surveyId) {
+      const vQuestions = activeSession.surveys ? sortedQuestions(activeSession.surveys) : []
+      const vIdx = activeSession.current_question_index
+      const vQuestion = vIdx >= 1 && vIdx <= vQuestions.length ? vQuestions[vIdx - 1] : null
+      if (vQuestion?.type === 'text' && activeSession.surveys?.status === 'active') {
+        if (!isTranscriptionEnabled()) {
+          // fall through to the generic "reply with text" prompt
+        } else {
+          const media = await downloadMedia(audioMediaId)
+          if (media?.tooLarge) {
+            await sendTextMessage(phoneNumber, 'That voice note is a bit long 😅 — please keep it under 3 minutes, or type your answer.')
+            return
+          }
+          const transcript = media ? await transcribeAudio(media.data, media.mimeType) : null
+          if (!transcript) {
+            await sendTextMessage(phoneNumber, "Sorry, I couldn't make out that voice note. Please try again or type your answer.")
+            return
+          }
+          await sendTextMessage(phoneNumber, `🎙️ Got it: "${transcript.length > 300 ? transcript.slice(0, 300) + '…' : transcript}"`)
+          messageText = transcript
+          kind = 'text'
+          isVoiceAnswer = true
+        }
+      } else if (vQuestion && activeSession.surveys?.status === 'active') {
+        await sendTextMessage(phoneNumber, 'Voice notes work on open questions only — please pick an option for this one.')
+        await sendQuestion(phoneNumber, vQuestion, vIdx, vQuestions.length)
+        return
+      }
+    }
+
     // Media (photo/voice/sticker/…) carries no answer. Prompt for text rather
     // than silently ignoring it; delivery receipts never reach us as 'media'.
     if (kind === 'media' || !messageText) {
@@ -257,7 +294,7 @@ export async function handleIncomingMessage(
         } else {
           await sendTextMessage(
             phoneNumber,
-            "I can't read photos, voice notes or stickers yet — please reply with text."
+            "I can't read photos or stickers — please reply with text (voice notes work on open questions)."
           )
         }
       } else if (surveyId) {
@@ -426,6 +463,7 @@ export async function handleIncomingMessage(
         question_id: answeredQuestion.id,
         option_id: verdict.optionId,
         text_answer: verdict.optionId ? null : verdict.text,
+        is_voice: isVoiceAnswer,
       })
     }
 
